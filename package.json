@@ -18,7 +18,11 @@
   },
   "homepage": "https://github.com/calebnjw/PROJECT_timeark_backend#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "mongoose": "^6.5.2",
     "nodemon": "^2.0.19",
     "typescript": "^4.7.4"
   },
