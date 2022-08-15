@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Base = require('./baseModel.js')
+const Base = require("./baseModel.js");
 const UserSchema = new mongoose.Schema(
   {
     name: {
@@ -11,8 +11,8 @@ const UserSchema = new mongoose.Schema(
       allowNull: false,
     },
     randomInput: {
-        type: String
-    }
+      type: String,
+    },
   },
   {
     timestamps: true,
@@ -21,9 +21,8 @@ const UserSchema = new mongoose.Schema(
 
 class Users extends Base {
   constructor() {
-    super(UserSchema, "Users")
+    super(UserSchema, "Users");
   }
-
 }
 
 module.exports = Users;
