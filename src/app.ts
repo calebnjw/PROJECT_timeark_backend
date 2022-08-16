@@ -1,4 +1,12 @@
-console.log("hello world");
+import express from "express";
+import { PORT } from "./utils/config";
+
+const app = express();
+app.use(express.json());
+
+app.use("/tasks", require("./routers/tasksRouter"));
+
+app.listen(PORT, () => console.log(`App is running on port ${PORT}.`));
 
 // // importing useful packages
 // const express = require("express");
