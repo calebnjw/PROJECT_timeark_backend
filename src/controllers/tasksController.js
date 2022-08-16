@@ -1,15 +1,19 @@
 const { Response: res, Request: req } = require("express");
 
 const getTasks = (req, res) => {
-  res.json({ msg: "all tasks" });
+  res.status(200).json({ msg: "all tasks" });
+};
+
+const addNewTask = (req, res) => {
+  if (!req.body.name) {
+    res.status(400);
+    throw new Error("task name is required");
+  }
+  res.status(201).json({ msg: "create a new task" });
 };
 
 const getSingleTask = (req, res) => {
   res.json({ msg: `show single task: ${req.params.id}` });
-};
-
-const addNewTask = (req, res) => {
-  res.json({ msg: "create a new task" });
 };
 
 const updateTask = (req, res) => {
