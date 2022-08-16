@@ -1,6 +1,6 @@
 const BaseController = require("./baseController");
 
-class TimeTrackingController extends BaseController {
+class TaskController extends BaseController {
   constructor(model) {
     super(model);
     // this.userMongo = userMongo
@@ -13,4 +13,4 @@ class TimeTrackingController extends BaseController {
   }
 }
 
-module.exports = TimeTrackingController;
+module.exports = TaskController;

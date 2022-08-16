@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-class TimeTrackingsRouter {
+class TasksRouter {
   constructor(controller) {
     this.controller = controller;
   }
@@ -12,4 +12,4 @@ class TimeTrackingsRouter {
   }
 }
 
-module.exports = TimeTrackingsRouter;
+module.exports = TasksRouter;
