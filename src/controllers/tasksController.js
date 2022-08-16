@@ -1,28 +1,47 @@
 const { Response: res, Request: req } = require("express");
+const asyncHandler = require("express-async-handler");
+const Task = require("../models/taskModel");
 
-const getTasks = (req, res) => {
-  res.status(200).json({ msg: "all tasks" });
-};
+const getTasks = asyncHandler(async (req, res) => {
+  const tasks = await Task.find();
+  res.status(200).json(tasks);
+});
 
-const addNewTask = (req, res) => {
+const addNewTask = asyncHandler(async (req, res) => {
   if (!req.body.name) {
     res.status(400);
     throw new Error("task name is required");
   }
-  res.status(201).json({ msg: "create a new task" });
-};
 
-const getSingleTask = (req, res) => {
-  res.json({ msg: `show single task: ${req.params.id}` });
-};
+  const newTask = await Task.create(req.body);
+  if (!newTask) {
+    res.status(404);
+    throw new Error("Task is not added.");
+  }
+  res.status(200).json(newTask);
+});
 
-const updateTask = (req, res) => {
+const getSingleTask = asyncHandler(async (req, res) => {
+  const task = await Task.findById(req.params.id);
+  if (!task) {
+    res.status(404);
+    throw new Error("No task found!");
+  }
+  res.status(200).json(task);
+});
+
+const updateTask = asyncHandler(async (req, res) => {
   res.json({ msg: `update task: ${req.params.id}` });
-};
+});
 
-const deleteTask = (req, res) => {
-  res.json({ msg: `delete task: ${req.params.id}` });
-};
+const deleteTask = asyncHandler(async (req, res) => {
+  const task = await Task.findByIdAndDelete(req.params.id);
+  if (!task) {
+    res.status(404);
+    throw new Error("Task is not found!");
+  }
+  res.status(200).json({ msg: `Deleted task: ${req.params.id}`, task: task });
+});
 
 module.exports = {
   getTasks,
@@ -31,20 +50,3 @@ module.exports = {
   updateTask,
   deleteTask,
 };
-
-// const BaseController = require("./baseController");
-
-// class TaskController extends BaseController {
-//   constructor(model) {
-//     super(model);
-//     // this.userMongo = userMongo
-//   }
-
-//   async timeInsert(req, res) {
-//     const newTask = await this.model.createOne({ ...req.body });
-//     // const userCheck = await this.userMongo.findById(newUser._id)
-//     return res.json({ newUser });
-//   }
-// }
-
-// module.exports = TaskController;
