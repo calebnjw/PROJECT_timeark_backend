@@ -9,15 +9,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-class UserController {
+class TaskController {
     constructor(model) {
         this.model = model;
     }
-    createUser(req, res) {
+    addNewTask(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const newUser = yield this.model.create(Object.assign({}, req.body));
-            return res.json({ newUser });
+            const newTask = yield this.model.create(Object.assign({}, req.body));
+            return res.json({ newTask });
         });
     }
 }
-exports.default = UserController;
+exports.default = TaskController;
