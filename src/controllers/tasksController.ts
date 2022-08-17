@@ -1,4 +1,6 @@
 import { Request, Response } from "express";
+import { Model } from "mongoose";
+import ITask from "../interfaces/task";
 
 class TaskController {
   public model: any;
@@ -28,7 +30,6 @@ class TaskController {
 
   async deleteTask(req: Request, res: Response) {
     const task = await this.model.findById(req.params.id);
-    task.destroy();
     return res.json({ task });
   }
 }

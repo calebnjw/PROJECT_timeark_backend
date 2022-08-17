@@ -13,7 +13,7 @@ class UsersRouter {
         router
             .get("/", this.controller.getAllTasks.bind(this.controller))
             .post("/new", this.controller.createTask.bind(this.controller))
-            .get("/:id", this.controller.getSingleTask.vind(this.controller))
+            .get("/:id", this.controller.getSingleTask.bind(this.controller))
             .put("/:id", this.controller.updateTask.bind(this.controller))
             .delete("/:id", this.controller.deleteTask.bind(this.controller));
         return router;

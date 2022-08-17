@@ -13,10 +13,35 @@ class TaskController {
     constructor(model) {
         this.model = model;
     }
-    addNewTask(req, res) {
+    getAllTasks(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tasks = yield this.model.findAll();
+            return res.json({ tasks });
+        });
+    }
+    createTask(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const newTask = yield this.model.create(Object.assign({}, req.body));
             return res.json({ newTask });
+        });
+    }
+    getSingleTask(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const task = yield this.model.findById(req.params.id);
+            return res.json({ task });
+        });
+    }
+    updateTask(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const task = yield this.model.findById(req.params.id);
+            return res.json({ task });
+        });
+    }
+    deleteTask(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const task = yield this.model.findById(req.params.id);
+            task.destroy();
+            return res.json({ task });
         });
     }
 }
