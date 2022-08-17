@@ -5,10 +5,25 @@ const BillingSchema: Schema = new Schema({
   company_name: {
     type: String,
   },
-  address: {
+  building_name: {
     type: String,
   },
-  contact_address: {
+  unit_number: {
+    type: String,
+  },
+  street_name: {
+    type: String,
+  },
+  city: {
+    type: String,
+  },
+  country: {
+    type: String,
+  },
+  postal_code: {
+    type: String,
+  },
+  contact_number: {
     type: String,
   },
   company_registration: {
