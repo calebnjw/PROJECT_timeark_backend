@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
+import { Model } from "mongoose";
+import IUsers from "../interfaces/user";
 
 class UserController {
-  public model: any;
-  constructor(model: any) {
+  public model: Model<IUsers>;
+  constructor(model: Model<IUsers>) {
     this.model = model;
   }
 
