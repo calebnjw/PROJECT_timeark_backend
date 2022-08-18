@@ -1,6 +1,6 @@
 import { Document, Types } from "mongoose";
 
-export interface IClients extends Document {
+export default interface IClients extends Document {
   client_name: string;
   billing_details: IBilling; // interface for billing information
   project_ids: [

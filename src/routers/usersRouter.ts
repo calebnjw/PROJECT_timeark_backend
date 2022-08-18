@@ -8,7 +8,7 @@ export default class UsersRouter {
   }
 
   routes() {
-    router.post("/mongo", this.controller.createUser.bind(this.controller));
+    // router.post("/mongo", this.controller.createUser.bind(this.controller));
 
     return router;
   }

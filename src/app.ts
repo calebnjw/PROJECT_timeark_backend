@@ -13,15 +13,19 @@ import ClientModel from "./models/clients";
 
 // import controllers
 import UsersController from "./controllers/usersController";
+import ClientController from "./controllers/clientController";
 
 // initializing Controllers
 const userController = new UsersController(UserModel);
+const clientController = new ClientController(ClientModel);
 
 // import routers
 import UsersRouter from "./routers/usersRouter";
+import ClientRouter from "./routers/clientRouter";
 
 // initialize routers
 const usersRouter = new UsersRouter(userController).routes();
+const clientRouter = new UsersRouter(clientController).routes();
 
 // below is where we put things together
 const app: express.Application = express();
@@ -35,6 +39,7 @@ app.use(
 );
 
 app.use("/users", usersRouter);
+app.use("/clients", clientRouter);
 
 const PORT: number | string = process.env.PORT || 8080;
 

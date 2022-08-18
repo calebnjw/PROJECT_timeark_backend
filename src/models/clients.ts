@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { IBilling, IClients } from "../interfaces/clients";
+import IClients, { IBilling } from "../interfaces/clients";
 
 const BillingSchema: Schema<IBilling> = new Schema({
   company_name: {
