@@ -1,4 +1,6 @@
 # Dependency directories
 node_modules/
+# Compiled files
+dist/
 # Do not commit env folder
 .env
