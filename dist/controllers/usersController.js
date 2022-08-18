@@ -10,12 +10,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 class UserController {
-    constructor(userModel) {
-        this.model = userModel;
+    constructor(model) {
+        this.model = model;
     }
     createUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const newUser = yield this.model.createOne(Object.assign({}, req.body));
+            const newUser = yield this.model.create(Object.assign({}, req.body));
             return res.json({ newUser });
         });
     }

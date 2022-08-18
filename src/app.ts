@@ -9,22 +9,27 @@ import "./models";
 
 // import Mongo Models
 import UserModel from "./models/users";
+import ProjectModel from "./models/projects";
 import ClientModel from "./models/clients";
 
 // import controllers
 import UsersController from "./controllers/usersController";
+import ProjectsController from "./controllers/projectsController";
 import ClientController from "./controllers/clientController";
 
 // initializing Controllers
-const userController = new UsersController(UserModel);
 const clientController = new ClientController(ClientModel);
+const userController = new UsersController(UserModel);
+const ProjectController = new ProjectsController(ProjectModel);
 
 // import routers
-import UsersRouter from "./routers/usersRouter";
+const usersRouter = new UsersRouter(userController).routes();
+const projectsRouter = new ProjectsRouter(ProjectController).routes();
 import ClientRouter from "./routers/clientRouter";
 
 // initialize routers
-const usersRouter = new UsersRouter(userController).routes();
+import UsersRouter from "./routers/usersRouter";
+import ProjectsRouter from "./routers/projectsRouter";
 const clientRouter = new ClientRouter(clientController).routes();
 
 // below is where we put things together
@@ -40,6 +45,7 @@ app.use(
 
 app.use("/users", usersRouter);
 app.use("/clients", clientRouter);
+app.use("/projects", projectsRouter);
 
 const PORT: number | string = process.env.PORT || 8080;
 

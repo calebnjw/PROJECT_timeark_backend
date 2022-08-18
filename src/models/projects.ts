@@ -1,35 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-
-const DurationSchema: Schema = new Schema({
-  start_time: {
-    type: String,
-  },
-  end_time: {
-    type: String,
-  },
-});
-
-const TaskSchema: Schema = new Schema({
-  name: {
-    type: String,
-  },
-  category: {
-    type: String,
-  },
-  duration: DurationSchema,
-});
-
-const InvoiceSchema: Schema = new Schema({
-  issue_date: {
-    type: Date,
-  },
-  paid: {
-    type: Boolean,
-  },
-  overdue: {
-    type: Boolean,
-  },
-});
+import IProjects from "../interfaces/project";
 
 const ProjectSchema: Schema = new Schema(
   {
@@ -38,24 +8,30 @@ const ProjectSchema: Schema = new Schema(
       required: true,
     },
     budget: {
-      type: Float32Array,
+      type: Number,
       required: true,
     },
     rate: {
-      type: Float32Array,
-      allowNull: false,
+      type: Number,
+      required: true,
     },
     due_date: {
-      type: Float32Array,
-      allowNull: false,
+      type: Date,
+      required: true,
     },
     category_name: {
-      type: Array,
+      type: [],
     },
-    task: TaskSchema,
-    invoice: InvoiceSchema,
+    tasks: {
+      type: [],
+    },
+    invoices: {
+      type: [],
+    },
   },
   {
     timestamps: true,
   }
 );
+
+export default mongoose.model<IProjects>("Tasks", ProjectSchema);
