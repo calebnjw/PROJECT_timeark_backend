@@ -25,7 +25,7 @@ import ClientRouter from "./routers/clientRouter";
 
 // initialize routers
 const usersRouter = new UsersRouter(userController).routes();
-const clientRouter = new UsersRouter(clientController).routes();
+const clientRouter = new ClientRouter(clientController).routes();
 
 // below is where we put things together
 const app: express.Application = express();
@@ -43,4 +43,4 @@ app.use("/clients", clientRouter);
 
 const PORT: number | string = process.env.PORT || 8080;
 
-app.listen(PORT, () => console.log(`App listening on post ${PORT}`));
+app.listen(PORT, () => console.log(`App listening on port ${PORT}`));
