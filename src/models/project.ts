@@ -28,10 +28,14 @@ const ProjectSchema: Schema = new Schema(
     invoices: {
       type: [],
     },
+    client_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Client",
+    },
   },
   {
     timestamps: true,
   }
 );
 
-export default mongoose.model<IProjects>("Tasks", ProjectSchema);
+export default mongoose.model<IProjects>("Project", ProjectSchema);

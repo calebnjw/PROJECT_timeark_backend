@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { Model } from "mongoose";
 import IProjects from "../interfaces/project";
+import IClients from "../interfaces/client";
+import Client from "../models/client";
 
-class TaskController {
+class ProjectController {
   public model: Model<IProjects>;
   constructor(model: Model<IProjects>) {
     this.model = model;
@@ -14,8 +16,24 @@ class TaskController {
   }
 
   async createProject(req: Request, res: Response) {
+    const { client_id } = req.body;
+    console.log("client id: ", client_id);
+    const client: any = await Client.findById(client_id);
+    console.log("client details:", client);
+
+    // Need to Check client.user_id === current user
+
+    console.log("project body: ", req.body);
     const newProject = await this.model.create({ ...req.body });
-    return res.json({ newProject });
+
+    console.log("new project id: ", newProject.id);
+
+    client.project_ids.push(newProject.id);
+    await client.save();
+
+    console.log("updated client:", client);
+    return res.json({});
+    // return res.json({ newProject });
   }
 
   async getSingleProject(req: Request, res: Response) {
@@ -35,4 +53,4 @@ class TaskController {
   }
 }
 
-export default TaskController;
+export default ProjectController;

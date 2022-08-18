@@ -9,10 +9,6 @@ mongoose.connect(
   options
 );
 
-// console.log(
-//   `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@timeark.tbir99u.mongodb.net/?retryWrites=true&w=majority`
-// );
-
 const db = mongoose.connection;
 
 db.on("error", (err: string) => {

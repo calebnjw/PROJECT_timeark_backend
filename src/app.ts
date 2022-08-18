@@ -9,8 +9,8 @@ import "./models";
 
 // import Mongo Models
 import UserModel from "./models/users";
-import ProjectModel from "./models/projects";
-import ClientModel from "./models/clients";
+import ProjectModel from "./models/project";
+import ClientModel from "./models/client";
 
 // import controllers
 import UsersController from "./controllers/usersController";
@@ -22,14 +22,14 @@ const clientController = new ClientController(ClientModel);
 const userController = new UsersController(UserModel);
 const ProjectController = new ProjectsController(ProjectModel);
 
+// initialize routers
+import UsersRouter from "./routers/usersRouter";
+import ClientRouter from "./routers/clientRouter";
+import ProjectsRouter from "./routers/projectsRouter";
+
 // import routers
 const usersRouter = new UsersRouter(userController).routes();
 const projectsRouter = new ProjectsRouter(ProjectController).routes();
-import ClientRouter from "./routers/clientRouter";
-
-// initialize routers
-import UsersRouter from "./routers/usersRouter";
-import ProjectsRouter from "./routers/projectsRouter";
 const clientRouter = new ClientRouter(clientController).routes();
 
 // below is where we put things together
