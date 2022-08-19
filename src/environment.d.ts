@@ -11,7 +11,7 @@ declare global {
       MONGO_URI: string;
 
       PORT: number;
-      NODE_ENV: string;
+      NODE_ENV: "development" | "production";
 
       GOOGLE_CLIENT_ID: string;
       GOOGLE_CLIENT_SECRET: string;

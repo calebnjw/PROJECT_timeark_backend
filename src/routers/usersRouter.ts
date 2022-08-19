@@ -12,7 +12,7 @@ export default class UsersRouter {
   routes() {
     router.get("/auth/google", this.passport.authenticate("google", { scope: ["profile"] }));
     router.get(
-      "/auth/google/callback",
+      "/auth/redirect/google",
       this.passport.authenticate("google", { failureRedirect: "/login" }),
       (req, res) => res.redirect("/app")
     );
