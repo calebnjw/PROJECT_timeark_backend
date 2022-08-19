@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import BSON from "BSON";
 import { Model, ObjectId } from "mongoose";
 
-import IClients from "../interfaces/clients";
+import IClients from "../interfaces/client";
 
 class ClientController {
   public model: Model<IClients>;
@@ -47,7 +47,10 @@ class ClientController {
     const clientDetails = request.body;
 
     try {
-      const data = await this.model.replaceOne({ _id: new BSON.ObjectId(clientId) }, clientDetails);
+      const data = await this.model.replaceOne(
+        { _id: new BSON.ObjectId(clientId) },
+        clientDetails
+      );
       return response.status(201).json(data);
     } catch (error) {
       console.log(error);

@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import IClients, { IBilling } from "../interfaces/clients";
+import IClients, { IBilling } from "../interfaces/client";
 
 const BillingSchema: Schema<IBilling> = new Schema({
   company_name: {
@@ -43,15 +43,16 @@ const ClientSchema: Schema<IClients> = new Schema(
       type: BillingSchema,
       required: true,
     },
-    project_ids: {
-      type: [{ type: Schema.Types.ObjectId }],
-      default: [],
-      required: true,
-    },
+    project_ids: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Project",
+      },
+    ],
   },
   {
     timestamps: true,
   }
 );
 
-export default mongoose.model<IClients>("Clients", ClientSchema);
+export default mongoose.model<IClients>("Client", ClientSchema);
