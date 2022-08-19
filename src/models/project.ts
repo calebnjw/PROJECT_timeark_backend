@@ -20,13 +20,16 @@ const ProjectSchema: Schema = new Schema(
       required: true,
     },
     category_name: {
-      type: [],
+      type: Array,
     },
-    tasks: {
-      type: [],
-    },
+    task_ids: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Task",
+      },
+    ],
     invoices: {
-      type: [],
+      type: Array,
     },
     client_id: {
       type: Schema.Types.ObjectId,
