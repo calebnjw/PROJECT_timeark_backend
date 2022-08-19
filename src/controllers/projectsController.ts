@@ -11,46 +11,58 @@ class ProjectController {
   }
 
   async getAllProjects(req: Request, res: Response) {
-    const projects = await this.model.find({});
-    return res.json({ projects });
+    try {
+      const { client_id } = req.query;
+      const client: any = await Client.findById(client_id).populate(
+        "project_ids"
+      );
+      const projects = client.project_ids;
+      return res.json({ projects });
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
   }
 
   async createProject(req: Request, res: Response) {
-    const { client_id } = req.body;
-    console.log("client id: ", client_id);
-    const client: any = await Client.findById(client_id);
-    console.log("client details:", client);
-
-    // Need to Check client.user_id === current user
-
-    console.log("project body: ", req.body);
-    const newProject = await this.model.create({ ...req.body });
-
-    console.log("new project id: ", newProject.id);
-
-    client.project_ids.push(newProject.id);
-    await client.save();
-
-    console.log("updated client:", client);
-    return res.json({});
-    // return res.json({ newProject });
+    try {
+      const { client_id } = req.body;
+      const client: any = await Client.findById(client_id);
+      // Need to Check if client.user_id === current user!!!
+      const newProject = await this.model.create({ ...req.body });
+      client.project_ids.push(newProject.id);
+      await client.save();
+      return res.json({ msg: "Added new project" });
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
   }
 
   async getSingleProject(req: Request, res: Response) {
-    const project = await this.model.findById(req.params.id);
-    return res.json({ project });
+    try {
+      const project = await this.model.findById(req.params.id);
+      return res.json({ project });
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
   }
 
   async updateProject(req: Request, res: Response) {
-    console.log("project updated: ", { ...req.body });
-    const project = await this.model.findByIdAndUpdate(req.params.id, req.body);
-    return res.json({ project });
+    try {
+      const project = await this.model.findByIdAndUpdate(
+        req.params.id,
+        req.body
+      );
+      console.log("updated Project: ", project);
+      return res.json({ msg: "Project updated" });
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
   }
-
-  async deleteProject(req: Request, res: Response) {
-    const project = await this.model.findByIdAndDelete(req.params.id);
-    return res.json({ project });
-  }
+  // TBD: need to discuss if we need delete project function
+  // async deleteProject(req: Request, res: Response) {
+  //   const project = await this.model.findByIdAndDelete(req.params.id);
+  //   return res.json({ project });
+  // }
 }
 
 export default ProjectController;
