@@ -2,7 +2,10 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+
 dotenv.config();
+
+import passport from "./config/passport/passport";
 
 // starting mongo
 import "./models";
@@ -28,7 +31,7 @@ import ClientRouter from "./routers/clientRouter";
 import ProjectsRouter from "./routers/projectsRouter";
 
 // import routers
-const usersRouter = new UsersRouter(userController).routes();
+const usersRouter = new UsersRouter(userController, passport).routes();
 const projectsRouter = new ProjectsRouter(ProjectController).routes();
 const clientRouter = new ClientRouter(clientController).routes();
 
