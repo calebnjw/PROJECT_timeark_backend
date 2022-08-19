@@ -12,6 +12,7 @@ class TaskController {
   async getAllTasks(req: Request, res: Response) {
     try {
       const { project_id } = req.query;
+      console.log("project id: ", project_id);
       const project: any = await Project.findById(project_id).populate(
         "task_ids"
       );

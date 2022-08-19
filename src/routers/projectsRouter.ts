@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-export default class UsersRouter {
+export default class ProjectsRouter {
   public controller: any;
   constructor(controller: any) {
     this.controller = controller;
