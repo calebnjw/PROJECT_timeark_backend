@@ -7,7 +7,8 @@ export default passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://www.example.com/auth/google/callback",
+      callbackURL: `http://localhost:${process.env.PORT}/auth/redirect/google`,
+      scope: ["profile"],
     },
     function (accessToken, refreshToken, profile, cb) {
       User.findOrCreate({ googleId: profile.id }, function (err, user) {

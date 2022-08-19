@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import passportLocalMongoose from "passport-local-mongoose";
 import IUsers from "../interfaces/user";
 
 const BillingSchema: Schema = new Schema({
@@ -54,5 +55,7 @@ const UserSchema: Schema = new Schema(
     timestamps: true,
   }
 );
+
+UserSchema.plugin(passportLocalMongoose);
 
 export default mongoose.model<IUsers>("Users", UserSchema);
