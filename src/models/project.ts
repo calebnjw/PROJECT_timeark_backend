@@ -28,9 +28,12 @@ const ProjectSchema: Schema = new Schema(
         ref: "Task",
       },
     ],
-    invoices: {
-      type: Array,
-    },
+    invoice_ids: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Invoice",
+      }
+    ],
     client_id: {
       type: Schema.Types.ObjectId,
       ref: "Client",

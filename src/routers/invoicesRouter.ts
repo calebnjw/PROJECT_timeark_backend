@@ -8,8 +8,8 @@ export default class InvoicesRouter {
   }
   routes() {
     router
-    .get("/", this.controller.getAllProjects.bind(this.controller))
-    .get("/invoice", this.controller.getAllInvoices.bind(this.controller))
+    .get("/", this.controller.getAllInvoices.bind(this.controller))
+    .post("/new", this.controller.createInvoice.bind(this.controller))
     .get("/:id", this.controller.getSingleInvoice.bind(this.controller))
 
     return router;

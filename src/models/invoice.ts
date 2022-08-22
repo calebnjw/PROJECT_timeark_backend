@@ -3,6 +3,10 @@ import IInvoices from "../interfaces/invoice";
 
 const InvoiceSchema: Schema = new Schema(
   {
+    project_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Project",
+    },
     paid: {
       type: Boolean,
       required: true,
