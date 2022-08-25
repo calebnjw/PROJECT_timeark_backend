@@ -58,10 +58,15 @@ class ProjectController {
       console.log("Error message: ", error);
     }
   }
+
   // TBD: need to discuss if we need delete project function
   // async deleteProject(req: Request, res: Response) {
-  //   const project = await this.model.findByIdAndDelete(req.params.id);
-  //   return res.json({ project });
+  //   try {
+  //     const project = await this.model.findByIdAndDelete(req.params.id);
+  //     return res.json({ project });
+  //   } catch (error) {
+  //     console.log("Error message: ", error);
+  //   }
   // }
 }
 

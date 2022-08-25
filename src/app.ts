@@ -11,35 +11,40 @@ import passportLocal from "passport-local";
 
 dotenv.config();
 
-// import userPassport from "./config/passport/passport";
+// import passport from "./config/passport/passport";
 
 // starting mongo
 import "./models";
 
 // import Mongo Models
 import UserModel from "./models/users";
-import ProjectModel from "./models/project";
 import ClientModel from "./models/client";
+import ProjectModel from "./models/project";
+import TaskModel from "./models/task";
 
 // import controllers
 import UsersController from "./controllers/usersController";
-import ProjectsController from "./controllers/projectsController";
 import ClientController from "./controllers/clientController";
+import ProjectsController from "./controllers/projectsController";
+import TasksController from "./controllers/tasksController";
 
 // initializing Controllers
-const clientController = new ClientController(ClientModel);
 const userController = new UsersController(UserModel);
+const clientController = new ClientController(ClientModel);
 const ProjectController = new ProjectsController(ProjectModel);
+const TaskController = new TasksController(TaskModel);
 
-// initialize routers
+// import routers
 import UsersRouter from "./routers/usersRouter";
 import ClientRouter from "./routers/clientRouter";
 import ProjectsRouter from "./routers/projectsRouter";
+import TasksRouter from "./routers/tasksRouter";
 
-// import routers
-const usersRouter = new UsersRouter(userController, passport).routes();
-const projectsRouter = new ProjectsRouter(ProjectController).routes();
+// initialize routers
+// const usersRouter = new UsersRouter(userController, passport).routes();
 const clientRouter = new ClientRouter(clientController).routes();
+const projectsRouter = new ProjectsRouter(ProjectController).routes();
+const tasksRouter = new TasksRouter(TaskController).routes();
 
 // below is where we put things together
 const app: express.Application = express();
@@ -103,9 +108,10 @@ passport.deserializeUser((id: string, done) => {
   });
 });
 
-app.use("/users", usersRouter);
+// app.use("/users", usersRouter);
 app.use("/clients", clientRouter);
 app.use("/projects", projectsRouter);
+app.use("/tasks", tasksRouter);
 
 app.post("/register", (request, response) => {
   const { username, password, first_name, last_name, email } = request?.body; // question mark in the event of empty body
