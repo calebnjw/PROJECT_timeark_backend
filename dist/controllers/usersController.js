@@ -8,15 +8,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const users_1 = __importDefault(require("../models/users"));
 class UserController {
     constructor(model) {
         this.model = model;
     }
-    createUser(req, res) {
+    createUser(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
-            const newUser = yield this.model.create(Object.assign({}, req.body));
-            return res.json({ newUser });
+            const { username, password, first_name, last_name, email } = request.body;
+            const hashedPassword = yield bcrypt_1.default.hash(password, process.env.SALT_ROUNDS);
+            const newUser = new users_1.default({
+                username,
+                password: hashedPassword,
+                first_name,
+                last_name,
+                email,
+            });
+            yield newUser.save();
+            return response.json({ newUser });
         });
     }
 }

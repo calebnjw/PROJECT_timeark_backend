@@ -6,11 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
 class UsersRouter {
-    constructor(controller) {
+    constructor(controller, passport) {
         this.controller = controller;
+        this.passport = passport;
     }
     routes() {
-        router.post("/mongo", this.controller.createUser.bind(this.controller));
+        router.get("/auth/google", this.passport.authenticate("google", { scope: ["profile"] }));
+        router.get("/auth/redirect/google", this.passport.authenticate("google", { failureRedirect: "/login" }), (req, res) => res.redirect("/app"));
+        router.post("/register", this.controller.createUser.bind(this.controller));
         return router;
     }
 }

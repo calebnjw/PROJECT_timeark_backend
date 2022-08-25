@@ -1,4 +1,6 @@
 import express from "express";
+import passport from "passport";
+
 const router = express.Router();
 
 export default class UsersRouter {
@@ -17,7 +19,12 @@ export default class UsersRouter {
       (req, res) => res.redirect("/app")
     );
 
-    // router.post("/mongo", this.controller.createUser.bind(this.controller));
+    router.post("/register", this.controller.createUser.bind(this.controller));
+    // router.post(
+    //   "/login",
+    //   passport.authenticate("local"),
+    //   this.controller.loginUser.bind(this.controller)
+    // );
 
     return router;
   }

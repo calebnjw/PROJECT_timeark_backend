@@ -34,17 +34,30 @@ const BillingSchema: Schema = new Schema({
 
 const UserSchema: Schema = new Schema(
   {
+    username: {
+      type: String,
+      allowNull: false,
+      unique: true,
+    },
+    password: {
+      type: String,
+      allowNull: false,
+      required: true,
+    },
     first_name: {
       type: String,
+      allowNull: false,
       required: true,
     },
     last_name: {
       type: String,
+      allowNull: false,
       required: true,
     },
     email: {
       type: String,
       allowNull: false,
+      required: true,
     },
     billing_details: BillingSchema,
     client_ids: {
