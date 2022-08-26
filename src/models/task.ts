@@ -11,8 +11,8 @@ const TaskSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    duration: {
-      type: Array,
+    hours: {
+      type: Number,
     },
     project_id: {
       type: Schema.Types.ObjectId,

@@ -9,10 +9,14 @@ export default class ClientsRouter {
 
   routes() {
     router.get("/", this.controller.getClients.bind(this.controller));
-    router.get("/:clientId", this.controller.getOneClient.bind(this.controller));
-
-    router.put("/:clientId/update", this.controller.updateClient.bind(this.controller));
-
+    router.get(
+      "/:clientId",
+      this.controller.getOneClient.bind(this.controller)
+    );
+    router.put(
+      "/:clientId/update",
+      this.controller.updateClient.bind(this.controller)
+    );
     router.post("/new", this.controller.createClient.bind(this.controller));
 
     return router;
