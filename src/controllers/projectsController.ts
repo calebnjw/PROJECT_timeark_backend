@@ -3,6 +3,7 @@ import { Model } from "mongoose";
 import IProjects from "../interfaces/project";
 import IClients from "../interfaces/client";
 import Client from "../models/client";
+import mongoose from "mongoose";
 
 class ProjectController {
   public model: Model<IProjects>;
@@ -13,11 +14,17 @@ class ProjectController {
   async getAllProjects(req: Request, res: Response) {
     try {
       const { client_id } = req.query;
-      const client: any = await Client.findById(client_id).populate(
-        "project_ids"
-      );
-      const projects = client.project_ids;
-      return res.json({ projects });
+      // const clientId = mongoose.Types.ObjectId(client_id);
+      console.log("client id:", client_id);
+      if (client_id) {
+        const client: any = await Client.findById(client_id).populate(
+          "project_ids"
+        );
+        const projects = client.project_ids;
+        return res.json({ projects });
+      } else {
+        return res.json({ msg: "no project found" });
+      }
     } catch (error) {
       console.log("Error message: ", error);
     }
@@ -31,7 +38,7 @@ class ProjectController {
       const newProject = await this.model.create({ ...req.body });
       client.project_ids.push(newProject.id);
       await client.save();
-      return res.json({ msg: "Added new project" });
+      return res.json({ msg: "Added new project", project_id: newProject.id });
     } catch (error) {
       console.log("Error message: ", error);
     }
