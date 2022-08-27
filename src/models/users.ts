@@ -25,15 +25,19 @@ const EmailSchema: Schema = new Schema({
   type: String,
 });
 
+const PhotoSchema: Schema = new Schema({
+  value: String,
+  type: String,
+});
+
 const UserSchema: Schema = new Schema(
   {
     provider: String,
-    id: String,
-    username: String,
-    password: String,
+    externalId: String,
     displayName: String,
     name: NameSchema,
     emails: [EmailSchema],
+    photos: [PhotoSchema],
     billingDetails: BillingSchema,
     clientIds: Array,
   },
