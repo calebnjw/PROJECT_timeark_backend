@@ -2,7 +2,6 @@ import bcrypt from "bcrypt";
 
 import { Request, Response } from "express";
 import { Model } from "mongoose";
-import passport from "passport";
 
 import IUsers from "../interfaces/user";
 import UserModel from "../models/users";

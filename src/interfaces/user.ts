@@ -1,13 +1,26 @@
 import { Document } from "mongoose";
 
 export default interface IUsers extends Document {
-  username: string;
-  password: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  billing_details?: IBilling;
-  client_ids?: string[];
+  provider?: string;
+  id?: string;
+  username?: string;
+  password?: string;
+  displayName?: string;
+  name: IName;
+  emails: IEmail[];
+  billingDetails?: IBilling;
+  clientIds?: string[];
+}
+
+export interface IName extends IUsers {
+  familyName: string;
+  givenName: string;
+  middleName?: string;
+}
+
+export interface IEmail extends IUsers {
+  value: string;
+  type?: string;
 }
 
 export interface IBilling extends IUsers {

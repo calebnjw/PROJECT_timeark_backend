@@ -14,17 +14,17 @@ export default class UsersRouter {
   routes() {
     router.get("/auth/google", this.passport.authenticate("google", { scope: ["profile"] }));
     router.get(
-      "/auth/redirect/google",
+      "/auth/google/callback",
       this.passport.authenticate("google", { failureRedirect: "/login" }),
       (req, res) => res.redirect("/app")
     );
 
     router.post("/register", this.controller.createUser.bind(this.controller));
-    // router.post(
-    //   "/login",
-    //   passport.authenticate("local"),
-    //   this.controller.loginUser.bind(this.controller)
-    // );
+    router.post(
+      "/login",
+      passport.authenticate("local"),
+      this.controller.loginUser.bind(this.controller)
+    );
 
     return router;
   }
