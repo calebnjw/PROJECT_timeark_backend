@@ -1,9 +1,10 @@
-import { Request } from "express";
+import { Request, Response } from "express";
 import passport from "passport";
 import { Profile, VerifyCallback } from "passport-google-oauth20";
 
 import UserModel from "../models/users";
 
+const PORT: number = process.env.PORT;
 const GOOGLE_CLIENT_ID: string = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET: string = process.env.GOOGLE_CLIENT_SECRET;
 
@@ -14,18 +15,17 @@ passport.use(
     {
       clientID: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
-      callbackURL: `/auth/google/callback`,
+      callbackURL: `http://localhost:${PORT}/auth/google/callback`,
     },
     async (
       request: Request,
-      response: Response,
       accessToken: string,
       refreshToken: string | undefined,
       profile: Profile,
       done: VerifyCallback
     ) => {
-      const { emails } = profile;
       let user: any;
+      const { emails } = profile;
 
       if (emails) {
         user = await UserModel.findOne({ "emails.value": emails[0].value });

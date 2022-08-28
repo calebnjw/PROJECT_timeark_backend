@@ -16,29 +16,68 @@ class UserController {
   }
 
   async logUser(request: Request, response: Response) {
+    console.log("REQUEST.USER", request.user);
+    console.log("REQUEST.SESSION", request.session);
+
     if (request.user) {
-      console.log("REQUEST.USER", request.user);
+      return response.status(200).json(request.user);
+    } else {
+      return response
+        .status(401)
+        .json({ success: false, message: "Session expired, please login again." });
     }
-    return response.send(request.user);
   }
 
-  async logout(request: Request, response: Response, next: NextFunction) {
+  async getUser(request: Request, response: Response) {
     if (request.user) {
-      request.logout((error) => {
-        if (error) {
-          console.log("LOGOUT ERROR", error);
-          return next(error);
-        }
-      });
-      request.session.destroy((error) => {
-        if (error) {
-          console.log("SESSION ERROR", error);
-          return next(error);
-        }
-        response.redirect(`${FRONTEND_URL}/login`);
-      });
+      const { id } = request.user;
+      try {
+        const user = await this.model.findOne({ id });
+        response.status(200).json({ success: true, message: "User found.", user });
+      } catch (error) {
+        response.status(404).json({ success: false, message: "User not found." });
+      }
     } else {
-      response.json({ message: "NO REQUEST.USER" });
+      return response
+        .status(401)
+        .json({ success: false, message: "Session expired, please login again." });
+    }
+  }
+
+  updateUser(request: Request, response: Response) {
+    if (request.user) {
+    } else {
+      return response
+        .status(401)
+        .json({ success: false, message: "Session expired, please login again." });
+    }
+  }
+
+  async logout(request: Request, response: Response) {
+    if (request.user) {
+      try {
+        console.log("REGENERATING SESSION");
+        request.session.regenerate((error) => {
+          if (error) console.error("REGENERATE ERROR");
+        });
+        console.log("REGENERATED SESSION");
+        request.logout((error) => {
+          if (error) console.error("LOGOUT ERROR");
+        });
+        console.log("LOGGED OUT");
+        request.session.destroy((error) => {
+          if (error) console.error("SESSION ERROR");
+        });
+        console.log("DESTROYED");
+        response.status(200).redirect(`${FRONTEND_URL}/login`);
+      } catch (error) {
+        console.error();
+        response.status(500).json({ success: false });
+      }
+    } else {
+      return response
+        .status(401)
+        .json({ success: false, message: "Session expired, please login again." });
     }
   }
 }
