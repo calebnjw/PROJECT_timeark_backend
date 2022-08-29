@@ -62,13 +62,13 @@ app.use(
 
 app.use(
   expressSession({
-    secret: GOOGLE_CLIENT_SECRET,
-    resave: false,
-    saveUninitialized: true,
     cookie: {
       secure: false,
-      maxAge: 3600,
+      maxAge: 24 * 60 * 60 * 1000,
     },
+    resave: false,
+    saveUninitialized: true,
+    secret: GOOGLE_CLIENT_SECRET,
     unset: "destroy",
   })
 );
