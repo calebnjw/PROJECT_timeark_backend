@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import passport from "passport";
 import { Profile, VerifyCallback } from "passport-google-oauth20";
+import IUsers from "../interfaces/user";
 
 import UserModel from "../models/users";
 
@@ -48,18 +49,14 @@ passport.use(
 );
 
 // saves user id in request.session.passport.user.
-passport.serializeUser((user: Express.User, done: VerifyCallback) => {
+passport.serializeUser((user: any, done: VerifyCallback) => {
   console.log("COVERING USER IN CEREAL");
   const { id, displayName } = user;
-  const data = {
-    id,
-    displayName,
-  };
-  return done(null, data);
+  return done(null, { id, displayName });
 });
 
 // then takes request.session.passport.user.id
-passport.deserializeUser((data: Express.User, done: VerifyCallback) => {
+passport.deserializeUser((user: any, done: VerifyCallback) => {
   console.log("REMOVING CEREAL FROM USER");
-  return done(null, data);
+  return done(null, user);
 });

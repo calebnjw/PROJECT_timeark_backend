@@ -15,11 +15,9 @@ class ProjectController {
     try {
       const { client_id } = req.query;
       // const clientId = mongoose.Types.ObjectId(client_id);
-      console.log("client id:", client_id);
+      // console.log("client id:", client_id);
       if (client_id) {
-        const client: any = await Client.findById(client_id).populate(
-          "project_ids"
-        );
+        const client: any = await Client.findById(client_id).populate("project_ids");
         const projects = client.project_ids;
         return res.json({ projects });
       } else {
@@ -55,10 +53,7 @@ class ProjectController {
 
   async updateProject(req: Request, res: Response) {
     try {
-      const project = await this.model.findByIdAndUpdate(
-        req.params.id,
-        req.body
-      );
+      const project = await this.model.findByIdAndUpdate(req.params.id, req.body);
       console.log("updated Project: ", project);
       return res.json({ msg: "Project updated" });
     } catch (error) {

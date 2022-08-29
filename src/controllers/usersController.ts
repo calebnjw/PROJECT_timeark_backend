@@ -54,8 +54,12 @@ class UserController {
   }
 
   async logout(request: Request, response: Response) {
+    console.log(process.env.TZ);
     if (request.user) {
       try {
+        console.log("LOGOUT");
+        console.log("REQUEST.USER", request.user);
+        console.log("REQUEST.SESSION", request.session);
         console.log("REGENERATING SESSION");
         request.session.regenerate((error) => {
           if (error) console.error("REGENERATE ERROR");

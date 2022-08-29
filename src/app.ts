@@ -69,6 +69,7 @@ app.use(
       secure: false,
       maxAge: 3600,
     },
+    unset: "destroy",
   })
 );
 
