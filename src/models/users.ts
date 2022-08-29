@@ -3,53 +3,43 @@ import passportLocalMongoose from "passport-local-mongoose";
 import IUsers from "../interfaces/user";
 
 const BillingSchema: Schema = new Schema({
-  company_name: {
-    type: String,
-  },
-  building_name: {
-    type: String,
-  },
-  unit_number: {
-    type: String,
-  },
-  street_name: {
-    type: String,
-  },
-  city: {
-    type: String,
-  },
-  country: {
-    type: String,
-  },
-  postal_code: {
-    type: String,
-  },
-  contact_number: {
-    type: String,
-  },
-  company_registration: {
-    type: String,
-  },
+  company_name: String,
+  building_name: String,
+  unit_number: String,
+  street_name: String,
+  city: String,
+  country: String,
+  postal_code: String,
+  contact_number: String,
+  company_registration: String,
+});
+
+const NameSchema: Schema = new Schema({
+  familyName: String,
+  givenName: String,
+  middleName: String,
+});
+
+const EmailSchema: Schema = new Schema({
+  value: String,
+  type: String,
+});
+
+const PhotoSchema: Schema = new Schema({
+  value: String,
+  type: String,
 });
 
 const UserSchema: Schema = new Schema(
   {
-    first_name: {
-      type: String,
-      required: true,
-    },
-    last_name: {
-      type: String,
-      required: true,
-    },
-    email: {
-      type: String,
-      allowNull: false,
-    },
-    billing_details: BillingSchema,
-    client_ids: {
-      type: Array,
-    },
+    provider: String,
+    externalId: String,
+    displayName: String,
+    name: NameSchema,
+    emails: [EmailSchema],
+    photos: [PhotoSchema],
+    billingDetails: BillingSchema,
+    clientIds: Array,
   },
   {
     timestamps: true,
