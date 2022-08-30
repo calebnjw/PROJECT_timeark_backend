@@ -31,6 +31,7 @@ class UserController {
   async getUser(request: Request, response: Response) {
     if (request.user) {
       const { id } = request.user;
+
       try {
         const user = await this.model.findOne({ id });
         response.status(200).json({ success: true, message: "User found.", user });
@@ -57,23 +58,16 @@ class UserController {
     console.log(process.env.TZ);
     if (request.user) {
       try {
-        console.log("LOGOUT");
-        console.log("REQUEST.USER", request.user);
-        console.log("REQUEST.SESSION", request.session);
-        console.log("REGENERATING SESSION");
         request.session.regenerate((error) => {
           if (error) console.error("REGENERATE ERROR");
         });
-        console.log("REGENERATED SESSION");
         request.logout((error) => {
           if (error) console.error("LOGOUT ERROR");
         });
-        console.log("LOGGED OUT");
         request.session.destroy((error) => {
           if (error) console.error("SESSION ERROR");
+          response.status(200).redirect(`${FRONTEND_URL}/login`);
         });
-        console.log("DESTROYED");
-        response.status(200).redirect(`${FRONTEND_URL}/login`);
       } catch (error) {
         console.error();
         response.status(500).json({ success: false });

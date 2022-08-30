@@ -25,13 +25,19 @@ passport.use(
       profile: Profile,
       done: VerifyCallback
     ) => {
-      let user: any;
       const { emails } = profile;
 
-      if (emails) {
+      let user: any;
+      // if user profile has emails
+      console.log("USER: (1)", user);
+      console.log("EMAILS:", emails);
+      console.log("PROFILE", profile);
+      if (emails && emails.length > 0) {
         user = await UserModel.findOne({ "emails.value": emails[0].value });
+        console.log("USER: (2)", user);
       }
 
+      // if user is null, create new entry
       if (!user) {
         user = await UserModel.create({
           provider: profile.provider,
@@ -41,7 +47,11 @@ passport.use(
           emails: profile.emails,
           photos: profile.photos,
         });
+        user.newUser = true; // set newUser to true
+      } else {
+        user.newUser = false; // set newUser to false by default
       }
+      console.log("USER: (3)", user);
 
       return done(null, user);
     }
@@ -49,14 +59,14 @@ passport.use(
 );
 
 // saves user id in request.session.passport.user.
-passport.serializeUser((user: any, done: VerifyCallback) => {
+passport.serializeUser((user: Express.User, done: VerifyCallback) => {
   console.log("COVERING USER IN CEREAL");
-  const { id, displayName } = user;
-  return done(null, { id, displayName });
+  const { id, displayName, newUser } = user;
+  return done(null, { id, displayName, newUser });
 });
 
 // then takes request.session.passport.user.id
-passport.deserializeUser((user: any, done: VerifyCallback) => {
+passport.deserializeUser((user: Express.User, done: VerifyCallback) => {
   console.log("REMOVING CEREAL FROM USER");
   return done(null, user);
 });
