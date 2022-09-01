@@ -7,6 +7,7 @@ const router = express.Router();
 
 export default class AuthRouter {
   routes() {
+    // route to send to google login.
     router.get(
       "/google",
       passport.authenticate("google", {
@@ -14,9 +15,11 @@ export default class AuthRouter {
       })
     );
 
+    // route google login redirects to.
     router.get(
       "/google/callback",
       passport.authenticate("google", {
+        // TODO: success should redirect to temporary route that checks whether new user, then that page will redirect to homepage or continue onboarding if new user.
         successRedirect: `${FRONTEND_URL}/projects`,
         failureRedirect: `${FRONTEND_URL}/login`,
       })

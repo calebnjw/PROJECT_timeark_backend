@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import passport from "passport";
 import { Profile, VerifyCallback } from "passport-google-oauth20";
-import IUsers from "../interfaces/user";
 
 import UserModel from "../models/users";
 
@@ -13,11 +12,14 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 passport.use(
   new GoogleStrategy(
+    // Google app credentials
     {
       clientID: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
       callbackURL: `http://localhost:${PORT}/auth/google/callback`,
     },
+    // function that receives profile information from Google
+    // and passes user object to serializeUser
     async (
       request: Request,
       accessToken: string,
@@ -25,19 +27,16 @@ passport.use(
       profile: Profile,
       done: VerifyCallback
     ) => {
-      const { emails } = profile;
+      const { emails } = profile; // get emails from google profile
+      let user: any; // declare variable to store emails
 
-      let user: any;
       // if user profile has emails
-      console.log("USER: (1)", user);
-      console.log("EMAILS:", emails);
-      console.log("PROFILE", profile);
       if (emails && emails.length > 0) {
-        user = await UserModel.findOne({ "emails.value": emails[0].value });
-        console.log("USER: (2)", user);
+        user = await UserModel.findOne({ "emails.value": emails[0].value }); // lookup database for account with same email
       }
 
-      // if user is null, create new entry
+      // if user returns null,
+      // create new entry in database
       if (!user) {
         user = await UserModel.create({
           provider: profile.provider,
@@ -47,25 +46,25 @@ passport.use(
           emails: profile.emails,
           photos: profile.photos,
         });
-        user.newUser = true; // set newUser to true
+        user.newUser = true; // TODO: if new user is true, login page should redirect to profile creation page
       } else {
-        user.newUser = false; // set newUser to false by default
+        user.newUser = false;
       }
-      console.log("USER: (3)", user);
 
       return done(null, user);
     }
   )
 );
 
-// saves user id in request.session.passport.user.
+// takes id, displayName and newUser state from previous return
+// and passes it to deserializeUser.
 passport.serializeUser((user: Express.User, done: VerifyCallback) => {
   console.log("COVERING USER IN CEREAL");
-  const { id, displayName, newUser } = user;
-  return done(null, { id, displayName, newUser });
+  const { id, newUser } = user;
+  return done(null, { id, newUser });
 });
 
-// then takes request.session.passport.user.id
+// saves information from previous return into request.session.passport.user.
 passport.deserializeUser((user: Express.User, done: VerifyCallback) => {
   console.log("REMOVING CEREAL FROM USER");
   return done(null, user);

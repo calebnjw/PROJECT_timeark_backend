@@ -11,6 +11,7 @@ export default class UsersRouter {
   routes() {
     router.get("/log", this.controller.logUser.bind(this.controller));
     router.get("/logout", this.controller.logout.bind(this.controller));
+
     router.get("/user", this.controller.getUser.bind(this.controller));
 
     // router.post("/register", this.controller.createUser.bind(this.controller));
