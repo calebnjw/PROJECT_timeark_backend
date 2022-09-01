@@ -60,8 +60,8 @@ passport.use(
 // and passes it to deserializeUser.
 passport.serializeUser((user: Express.User, done: VerifyCallback) => {
   console.log("COVERING USER IN CEREAL");
-  const { id, newUser } = user;
-  return done(null, { id, newUser });
+  const { id, displayName, newUser } = user;
+  return done(null, { id, displayName, newUser });
 });
 
 // saves information from previous return into request.session.passport.user.
