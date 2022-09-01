@@ -1,14 +1,14 @@
 import { Document, Types } from "mongoose";
 
-export interface IDuration extends Document {
-  start_time: Date;
-  end_time: Date;
+export interface ITime extends Document {
+  date: Date;
+  hours: number;
 }
 
 export default interface ITasks extends Document {
   name: string;
   category: string;
-  date: string;
-  hours: number;
+  isDone: boolean;
+  time_tracking: ITime[];
   project_id: Types.ObjectId;
 }

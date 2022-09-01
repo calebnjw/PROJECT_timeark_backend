@@ -1,7 +1,16 @@
 import mongoose, { Schema } from "mongoose";
-import ITasks from "../interfaces/task";
+import ITasks, { ITime } from "../interfaces/task";
 
-const TaskSchema: Schema = new Schema(
+const TimeSchema: Schema<ITime> = new Schema({
+  date: {
+    type: Date,
+  },
+  hours: {
+    type: Number,
+  },
+});
+
+const TaskSchema: Schema<ITasks> = new Schema(
   {
     name: {
       type: String,
@@ -11,13 +20,15 @@ const TaskSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    date: {
-      type: String,
+    isDone: {
+      type: Boolean,
       required: true,
     },
-    hours: {
-      type: Number,
-    },
+    time_tracking: [
+      {
+        type: TimeSchema,
+      },
+    ],
     project_id: {
       type: Schema.Types.ObjectId,
       ref: "Project",
