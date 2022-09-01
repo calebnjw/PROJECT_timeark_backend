@@ -8,6 +8,7 @@ export interface IDuration extends Document {
 export default interface ITasks extends Document {
   name: string;
   category: string;
+  date: string;
   hours: number;
   project_id: Types.ObjectId;
 }

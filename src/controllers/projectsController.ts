@@ -17,12 +17,23 @@ class ProjectController {
       // const clientId = mongoose.Types.ObjectId(client_id);
       // console.log("client id:", client_id);
       if (client_id) {
-        const client: any = await Client.findById(client_id).populate("project_ids");
+        const client: any = await Client.findById(client_id).populate(
+          "project_ids"
+        );
         const projects = client.project_ids;
         return res.json({ projects });
       } else {
         return res.json({ msg: "no project found" });
       }
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
+  }
+
+  async AllProjects(req: Request, res: Response) {
+    try {
+      const allProjects = await this.model.find();
+      return res.json({ allProjects });
     } catch (error) {
       console.log("Error message: ", error);
     }
@@ -53,7 +64,10 @@ class ProjectController {
 
   async updateProject(req: Request, res: Response) {
     try {
-      const project = await this.model.findByIdAndUpdate(req.params.id, req.body);
+      const project = await this.model.findByIdAndUpdate(
+        req.params.id,
+        req.body
+      );
       console.log("updated Project: ", project);
       return res.json({ msg: "Project updated" });
     } catch (error) {

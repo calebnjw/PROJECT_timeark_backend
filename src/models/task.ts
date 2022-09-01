@@ -11,6 +11,10 @@ const TaskSchema: Schema = new Schema(
       type: String,
       required: true,
     },
+    date: {
+      type: String,
+      required: true,
+    },
     hours: {
       type: Number,
     },

@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { request, Request, Response } from "express";
 import { Model } from "mongoose";
 import ITasks from "../interfaces/task";
 import Project from "../models/project";
@@ -40,6 +40,19 @@ class TaskController {
   async getSingleTask(req: Request, res: Response) {
     try {
       const task = await this.model.findById(req.params.id);
+      return res.json({ task });
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
+  }
+
+  async getTasksByDate(req: Request, res: Response) {
+    const { selectedDate } = req.body;
+    console.log(typeof selectedDate);
+    try {
+      const task = await this.model.find({
+        date: selectedDate,
+      });
       return res.json({ task });
     } catch (error) {
       console.log("Error message: ", error);
