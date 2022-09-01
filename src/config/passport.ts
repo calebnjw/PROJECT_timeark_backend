@@ -59,13 +59,11 @@ passport.use(
 // takes id, displayName and newUser state from previous return
 // and passes it to deserializeUser.
 passport.serializeUser((user: Express.User, done: VerifyCallback) => {
-  console.log("COVERING USER IN CEREAL");
   const { id, displayName, newUser } = user;
   return done(null, { id, displayName, newUser });
 });
 
 // saves information from previous return into request.session.passport.user.
 passport.deserializeUser((user: Express.User, done: VerifyCallback) => {
-  console.log("REMOVING CEREAL FROM USER");
   return done(null, user);
 });
