@@ -15,24 +15,25 @@ class UserController {
     this.model = model;
   }
 
+  // FUNCTION FOR TESTING: logs user and session
   async logUser(request: Request, response: Response) {
     console.log("REQUEST.USER", request.user);
     console.log("REQUEST.SESSION", request.session);
 
     if (request.user) {
-      return response.status(200).json(request.user);
+      return response.status(200).redirect(`${FRONTEND_URL}/login`);
     } else {
-      return response
-        .status(401)
-        .json({ success: false, message: "Session expired, please login again." });
+      return response.status(401).redirect(`${FRONTEND_URL}/login`);
     }
   }
 
   async getUser(request: Request, response: Response) {
     if (request.user) {
       const { id } = request.user;
+
       try {
         const user = await this.model.findOne({ id });
+
         response.status(200).json({ success: true, message: "User found.", user });
       } catch (error) {
         response.status(404).json({ success: false, message: "User not found." });
@@ -44,7 +45,7 @@ class UserController {
     }
   }
 
-  updateUser(request: Request, response: Response) {
+  async updateUser(request: Request, response: Response) {
     if (request.user) {
     } else {
       return response
@@ -54,29 +55,25 @@ class UserController {
   }
 
   async logout(request: Request, response: Response) {
-    console.log(process.env.TZ);
+    // if user session exists
     if (request.user) {
       try {
-        console.log("LOGOUT");
-        console.log("REQUEST.USER", request.user);
-        console.log("REQUEST.SESSION", request.session);
-        console.log("REGENERATING SESSION");
+        // regenerate a new session
         request.session.regenerate((error) => {
           if (error) console.error("REGENERATE ERROR");
         });
-        console.log("REGENERATED SESSION");
+        // removes request.user
         request.logout((error) => {
           if (error) console.error("LOGOUT ERROR");
         });
-        console.log("LOGGED OUT");
+        // and destroy current session
         request.session.destroy((error) => {
           if (error) console.error("SESSION ERROR");
+          response.status(200).redirect(`${FRONTEND_URL}/login`);
         });
-        console.log("DESTROYED");
-        response.status(200).redirect(`${FRONTEND_URL}/login`);
-      } catch (error) {
+      } catch (error: any) {
         console.error();
-        response.status(500).json({ success: false });
+        response.status(500).json({ success: false, message: error });
       }
     } else {
       return response
