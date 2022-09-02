@@ -56,6 +56,80 @@ class TaskController {
     }
   }
 
+  async getTasksBySelectedDate(req: Request, res: Response) {
+    try {
+      const { selectedDate } = req.params;
+      console.log("selected date: ", selectedDate);
+      // Get current user id from params, the get all users client_ids list
+      const clientList = [
+        "62fe4390abda69110eda75e5",
+        "62fe48248afea2260d3a178d",
+        "62fe4974f2fbc95a483cb11c",
+        "6303868c92a52dcf23bcc860",
+        "6303869c92a52dcf23bcc863",
+      ];
+
+      // Get projects by Client ID
+      let projects = [];
+      for (let i = 0; i < clientList.length; i++) {
+        let project = await Project.find({ client_id: clientList[i] });
+        projects.push(project);
+      }
+
+      // Get tasks by project ID
+      let tasks = [];
+      for (let i = 0; i < projects.length; i++) {
+        for (let j = 0; j < projects[i].length; j++) {
+          let task = await this.model.find({ project_id: projects[i][j]._id });
+          if (task.length) {
+            tasks.push(task);
+          }
+        }
+      }
+
+      function formatDate(date: Date) {
+        var d = new Date(date),
+          month = "" + (d.getMonth() + 1),
+          day = "" + d.getDate(),
+          year = d.getFullYear();
+
+        if (month.length < 2) month = "0" + month;
+        if (day.length < 2) day = "0" + day;
+
+        return [year, month, day].join("-");
+      }
+
+      // Get times tracking by task
+      let selectedTaskArr: any[] = [];
+      for (let i = 0; i < tasks.length; i++) {
+        let taskArr = tasks[i].filter((t) => {
+          if (t.time_tracking.length) {
+            return t;
+          }
+        });
+        if (taskArr.length) {
+          taskArr.forEach((task) => {
+            task.time_tracking.forEach((time) => {
+              if (formatDate(time.date) === selectedDate) {
+                // console.log("task, time", [task, time]);
+                selectedTaskArr.push([task, time]);
+              }
+            });
+          });
+        }
+      }
+
+      console.log(selectedTaskArr);
+      if (selectedTaskArr.length) {
+        return res.json({ selectedTaskArr });
+      } else {
+        return res.json({ msg: `No task found on selected date` });
+      }
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
+  }
+
   //TBD: need to discuss if we need delete task function
   // async deleteTask(req: Request, res: Response) {
   //   try {
