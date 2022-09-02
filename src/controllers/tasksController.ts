@@ -49,7 +49,6 @@ class TaskController {
   async updateTask(req: Request, res: Response) {
     try {
       const task = await this.model.findByIdAndUpdate(req.params.id, req.body);
-      console.log("updated Task: ", task);
       return res.json({ msg: "Task updated" });
     } catch (error) {
       console.log("Error message: ", error);
@@ -59,8 +58,7 @@ class TaskController {
   async getTasksBySelectedDate(req: Request, res: Response) {
     try {
       const { selectedDate } = req.params;
-      console.log("selected date: ", selectedDate);
-      // Get current user id from params, the get all users client_ids list
+      // Get current user id from params, the get all users client_ids list, To be added
       const clientList = [
         "62fe4390abda69110eda75e5",
         "62fe48248afea2260d3a178d",
@@ -87,6 +85,7 @@ class TaskController {
         }
       }
 
+      // Convert date to string
       function formatDate(date: Date) {
         var d = new Date(date),
           month = "" + (d.getMonth() + 1),
@@ -95,36 +94,42 @@ class TaskController {
 
         if (month.length < 2) month = "0" + month;
         if (day.length < 2) day = "0" + day;
-
         return [year, month, day].join("-");
       }
 
-      // Get times tracking by task
-      let selectedTaskArr: any[] = [];
-      for (let i = 0; i < tasks.length; i++) {
-        let taskArr = tasks[i].filter((t) => {
-          if (t.time_tracking.length) {
-            return t;
-          }
-        });
-        if (taskArr.length) {
-          taskArr.forEach((task) => {
-            task.time_tracking.forEach((time) => {
-              if (formatDate(time.date) === selectedDate) {
-                // console.log("task, time", [task, time]);
-                selectedTaskArr.push([task, time]);
-              }
-            });
-          });
-        }
-      }
+      const tasksArr = tasks.flat();
 
-      console.log(selectedTaskArr);
-      if (selectedTaskArr.length) {
-        return res.json({ selectedTaskArr });
+      // Sort out tasks by selected date
+      const tasksBySelectedDate = tasksArr.filter((task) => {
+        let temp = task.time_tracking.filter(
+          (time) => formatDate(time.date) === selectedDate
+        );
+        if (temp.length) {
+          return (task.time_tracking = temp);
+        }
+      });
+
+      if (tasksBySelectedDate.length) {
+        return res.json({ tasksBySelectedDate });
       } else {
         return res.json({ msg: `No task found on selected date` });
       }
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
+  }
+
+  async addNewTime(req: Request, res: Response) {
+    try {
+      const { task_id } = req.query;
+      // console.log("task id: ", task_id);
+      const task = await this.model.findById(task_id);
+      // console.log("task: ", task);
+      console.log("body: ", req.body);
+      const newTime = req.body;
+      task?.time_tracking.push(newTime);
+      task?.save();
+      return res.json({ task });
     } catch (error) {
       console.log("Error message: ", error);
     }
