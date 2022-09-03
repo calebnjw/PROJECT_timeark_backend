@@ -20,6 +20,10 @@ export default class TasksRouter {
       .post(
         "/:id/timetrackings",
         this.controller.addTimeTracking.bind(this.controller)
+      )
+      .post(
+        "/:id/timetrackings/:timetracking_id/stop",
+        this.controller.stopTimeTracking.bind(this.controller)
       );
     // .delete("/:id", this.controller.deleteTask.bind(this.controller));
 

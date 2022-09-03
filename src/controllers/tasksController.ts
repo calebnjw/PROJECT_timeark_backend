@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Model } from "mongoose";
+import { isObjectIdOrHexString, Model } from "mongoose";
 import ITasks from "../interfaces/task";
 import Project from "../models/project";
 
@@ -122,18 +122,46 @@ class TaskController {
   async addTimeTracking(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      console.log("task id: ", id);
-      // const task = await this.model.findById(task_id);
-
-      // task?.time_trackings.push(newTime);
-      // task?.save();
-      // return res.json({ task });
-      return res.json({ msg: "request received" });
+      const task = await this.model.findById(id);
+      const newTimeTracking: any = {
+        startDate: new Date(),
+      };
+      task?.time_trackings.push(newTimeTracking);
+      task?.save();
+      const time_trackingsArr: any = task?.time_trackings;
+      const newTimeTrackingId =
+        time_trackingsArr[time_trackingsArr.length - 1]._id;
+      return res.json({ newTimeTrackingId });
     } catch (error) {
       console.log("Error message: ", error);
     }
   }
 
+  async stopTimeTracking(req: Request, res: Response) {
+    try {
+      const { id, timetracking_id } = req.params;
+      const task = await this.model.findById(id);
+      const time_tracking = task?.time_trackings.find(
+        (t) => (t._id = timetracking_id)
+      );
+
+      if (!time_tracking?.endDate) {
+        const updatedTask = await this.model.findByIdAndUpdate(
+          { _id: id },
+          { $addToSet: { "time_trackings.$[elem].endDate": new Date() } },
+          { arrayFilters: [{ "elem._id": timetracking_id }] }
+        );
+        updatedTask?.save();
+        console.log("updated task: ", updatedTask);
+        return res.json({ msg: "end date added" });
+      } else {
+        console.log("task", task);
+        return res.json({ msg: "end date already exists" });
+      }
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
+  }
   //TBD: need to discuss if we need delete task function
   // async deleteTask(req: Request, res: Response) {
   //   try {
