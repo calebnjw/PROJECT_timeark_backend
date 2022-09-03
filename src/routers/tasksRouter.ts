@@ -12,7 +12,12 @@ export default class TasksRouter {
       .get("/", this.controller.getAllTasks.bind(this.controller))
       .post("/new", this.controller.createTask.bind(this.controller))
       .get("/:id", this.controller.getSingleTask.bind(this.controller))
-      .put("/:id/update", this.controller.updateTask.bind(this.controller));
+      .put("/:id/update", this.controller.updateTask.bind(this.controller))
+      .get(
+        "/time/:selectedDate",
+        this.controller.getTasksBySelectedDate.bind(this.controller)
+      )
+      .post("/time/new", this.controller.addNewTime.bind(this.controller));
     // .delete("/:id", this.controller.deleteTask.bind(this.controller));
 
     return router;
