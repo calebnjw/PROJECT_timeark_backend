@@ -101,11 +101,11 @@ class TaskController {
 
       // Sort out tasks by selected date
       const tasksBySelectedDate = tasksArr.filter((task) => {
-        let temp = task.time_tracking.filter(
-          (time) => formatDate(time.date) === selectedDate
+        let temp = task.time_trackings.filter(
+          (time) => formatDate(time.startDate) === selectedDate
         );
         if (temp.length) {
-          return (task.time_tracking = temp);
+          return (task.time_trackings = temp);
         }
       });
 
@@ -119,17 +119,16 @@ class TaskController {
     }
   }
 
-  async addNewTime(req: Request, res: Response) {
+  async addTimeTracking(req: Request, res: Response) {
     try {
-      const { task_id } = req.query;
-      // console.log("task id: ", task_id);
-      const task = await this.model.findById(task_id);
-      // console.log("task: ", task);
-      console.log("body: ", req.body);
-      const newTime = req.body;
-      task?.time_tracking.push(newTime);
-      task?.save();
-      return res.json({ task });
+      const { id } = req.params;
+      console.log("task id: ", id);
+      // const task = await this.model.findById(task_id);
+
+      // task?.time_trackings.push(newTime);
+      // task?.save();
+      // return res.json({ task });
+      return res.json({ msg: "request received" });
     } catch (error) {
       console.log("Error message: ", error);
     }

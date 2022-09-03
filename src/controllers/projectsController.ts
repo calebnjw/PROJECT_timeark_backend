@@ -3,6 +3,7 @@ import { Model } from "mongoose";
 import IProjects from "../interfaces/project";
 import IClients from "../interfaces/client";
 import Client from "../models/client";
+import Project from "../models/project";
 import mongoose from "mongoose";
 
 class ProjectController {
@@ -17,11 +18,13 @@ class ProjectController {
       // const clientId = mongoose.Types.ObjectId(client_id);
       // console.log("client id:", client_id);
       if (client_id) {
-        const client: any = await Client.findById(client_id).populate("project_ids");
+        const client: any = await Client.findById(client_id).populate(
+          "project_ids"
+        );
         const projects = client.project_ids;
         return res.json({ projects });
       } else {
-        return res.json({ msg: "no project found" });
+        return res.json({ msg: "client_id missing" });
       }
     } catch (error) {
       console.log("Error message: ", error);
@@ -45,7 +48,11 @@ class ProjectController {
   async getSingleProject(req: Request, res: Response) {
     try {
       const project = await this.model.findById(req.params.id);
-      return res.json({ project });
+      if (project) {
+        return res.json({ project });
+      } else {
+        return res.json({ msg: "no project created!" });
+      }
     } catch (error) {
       console.log("Error message: ", error);
     }
@@ -53,7 +60,10 @@ class ProjectController {
 
   async updateProject(req: Request, res: Response) {
     try {
-      const project = await this.model.findByIdAndUpdate(req.params.id, req.body);
+      const project = await this.model.findByIdAndUpdate(
+        req.params.id,
+        req.body
+      );
       console.log("updated Project: ", project);
       return res.json({ msg: "Project updated" });
     } catch (error) {

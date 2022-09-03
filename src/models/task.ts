@@ -2,11 +2,11 @@ import mongoose, { Schema } from "mongoose";
 import ITasks, { ITime } from "../interfaces/task";
 
 const TimeSchema: Schema<ITime> = new Schema({
-  date: {
+  startDate: {
     type: Date,
   },
-  hours: {
-    type: Number,
+  endDate: {
+    type: Date,
   },
 });
 
@@ -24,7 +24,7 @@ const TaskSchema: Schema<ITasks> = new Schema(
       type: Boolean,
       required: true,
     },
-    time_tracking: [
+    time_trackings: [
       {
         type: TimeSchema,
       },
