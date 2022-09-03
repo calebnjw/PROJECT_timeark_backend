@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { isObjectIdOrHexString, Model } from "mongoose";
 import ITasks from "../interfaces/task";
 import Project from "../models/project";
+import Task from "../models/task";
 
 class TaskController {
   public model: Model<ITasks>;
@@ -131,7 +132,7 @@ class TaskController {
       const time_trackingsArr: any = task?.time_trackings;
       const newTimeTrackingId =
         time_trackingsArr[time_trackingsArr.length - 1]._id;
-      return res.json({ newTimeTrackingId });
+      return res.json({ newTimeTrackingId, task });
     } catch (error) {
       console.log("Error message: ", error);
     }
@@ -142,26 +143,25 @@ class TaskController {
       const { id, timetracking_id } = req.params;
       const task = await this.model.findById(id);
       const time_tracking = task?.time_trackings.find(
-        (t) => (t._id = timetracking_id)
+        (t) => t._id === timetracking_id
       );
 
       if (!time_tracking?.endDate) {
-        const updatedTask = await this.model.findByIdAndUpdate(
+        const updatedTask = await Task.updateOne(
           { _id: id },
-          { $addToSet: { "time_trackings.$[elem].endDate": new Date() } },
-          { arrayFilters: [{ "elem._id": timetracking_id }] }
+          { $set: { "time_trackings.$[element].endDate": new Date() } },
+          { arrayFilters: [{ "element._id": timetracking_id }] }
         );
-        updatedTask?.save();
-        console.log("updated task: ", updatedTask);
-        return res.json({ msg: "end date added" });
+        return res.json({ msg: "end date added", updatedTask });
       } else {
-        console.log("task", task);
         return res.json({ msg: "end date already exists" });
       }
     } catch (error) {
       console.log("Error message: ", error);
+      return res.status(500).json("Internal server error");
     }
   }
+
   //TBD: need to discuss if we need delete task function
   // async deleteTask(req: Request, res: Response) {
   //   try {
