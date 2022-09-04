@@ -8,6 +8,7 @@ export default interface IClients extends Document {
       type: Types.ObjectId;
     }
   ];
+  user_id: Types.ObjectId;
 }
 
 export interface IBilling extends IClients {
