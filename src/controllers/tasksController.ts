@@ -32,7 +32,7 @@ class TaskController {
       const newTask = await this.model.create({ ...req.body });
       project.task_ids.push(newTask.id);
       await project.save();
-      return res.json({ msg: "Added new task" });
+      return res.json({ msg: "Added new task", newTask });
     } catch (error) {
       console.log("Error message: ", error);
     }
@@ -62,10 +62,7 @@ class TaskController {
       // Get current user id from params, the get all users client_ids list, To be added
       const clientList = [
         "62fe4390abda69110eda75e5",
-        "62fe48248afea2260d3a178d",
         "62fe4974f2fbc95a483cb11c",
-        "6303868c92a52dcf23bcc860",
-        "6303869c92a52dcf23bcc863",
       ];
 
       // Get projects by Client ID
