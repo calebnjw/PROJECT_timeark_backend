@@ -17,7 +17,11 @@ class ClientController {
       console.log("user id:", user_id);
       const data = await this.model.find({ user_id: user_id });
       console.log(data);
-      return response.status(200).json(data);
+      if (data) {
+        return response.status(200).json(data);
+      } else {
+        return response.json({ msg: "no client found" });
+      }
     } catch (error) {
       console.log(error);
     }
