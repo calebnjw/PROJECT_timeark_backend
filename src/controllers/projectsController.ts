@@ -71,6 +71,30 @@ class ProjectController {
     }
   }
 
+  async getUsersAllProjects(req: Request, res: Response) {
+    try {
+      const { user_id } = req.query;
+      const clients = await Client.find({ user_id: user_id }).populate(
+        "project_ids"
+      );
+      const getProjects = clients.map((c) => {
+        return c.project_ids;
+      });
+
+      const projects = getProjects.flat();
+      if (projects.length) {
+        return res.json({
+          msg: "request all user's projects received",
+          projects,
+        });
+      } else {
+        return res.json({ msg: "User has no project" });
+      }
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
+  }
+
   // TBD: need to discuss if we need delete project function
   // async deleteProject(req: Request, res: Response) {
   //   try {

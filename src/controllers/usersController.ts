@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from "express";
 import { Model } from "mongoose";
 
 import IUsers from "../interfaces/user";
-import UserModel from "../models/users";
+import UserModel from "../models/user";
 
 const SALT = Number(process.env.SALT_ROUNDS);
 const FRONTEND_URL = process.env.FRONTEND_URL;
@@ -34,14 +34,21 @@ class UserController {
       try {
         const user = await this.model.findOne({ id });
 
-        response.status(200).json({ success: true, message: "User found.", user });
+        response
+          .status(200)
+          .json({ success: true, message: "User found.", user });
       } catch (error) {
-        response.status(404).json({ success: false, message: "User not found." });
+        response
+          .status(404)
+          .json({ success: false, message: "User not found." });
       }
     } else {
       return response
         .status(401)
-        .json({ success: false, message: "Session expired, please login again." });
+        .json({
+          success: false,
+          message: "Session expired, please login again.",
+        });
     }
   }
 
@@ -50,7 +57,10 @@ class UserController {
     } else {
       return response
         .status(401)
-        .json({ success: false, message: "Session expired, please login again." });
+        .json({
+          success: false,
+          message: "Session expired, please login again.",
+        });
     }
   }
 
@@ -78,7 +88,10 @@ class UserController {
     } else {
       return response
         .status(401)
-        .json({ success: false, message: "Session expired, please login again." });
+        .json({
+          success: false,
+          message: "Session expired, please login again.",
+        });
     }
   }
 }

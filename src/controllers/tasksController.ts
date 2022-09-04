@@ -143,10 +143,11 @@ class TaskController {
       const { id, timetracking_id } = req.params;
       const task = await this.model.findById(id);
       const time_tracking = task?.time_trackings.find(
-        (t) => t._id === timetracking_id
+        (t) => t._id == timetracking_id
       );
 
       if (!time_tracking?.endDate) {
+        console.debug("no date found");
         const updatedTask = await Task.updateOne(
           { _id: id },
           { $set: { "time_trackings.$[element].endDate": new Date() } },
@@ -154,6 +155,7 @@ class TaskController {
         );
         return res.json({ msg: "end date added", updatedTask });
       } else {
+        console.info("date found");
         return res.json({ msg: "end date already exists" });
       }
     } catch (error) {
