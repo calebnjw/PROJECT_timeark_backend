@@ -58,6 +58,37 @@ class TaskController {
     }
   }
 
+  async getTasksByProject(req: Request, res: Response) {
+    const { user_id } = req.query;
+    try {
+      const getUserClients = await Client.find({ user_id: user_id });
+      const clientList = getUserClients.map((c) => c._id);
+
+      // Get projects by Client ID
+      let projects = [];
+      for (let i = 0; i < clientList.length; i++) {
+        let project = await Project.find({ client_id: clientList[i] });
+        projects.push(project);
+      }
+
+      // Get tasks by project ID
+      let tasks = [];
+      for (let i = 0; i < projects.length; i++) {
+        for (let j = 0; j < projects[i].length; j++) {
+          let task = await this.model.find({ project_id: projects[i][j]._id });
+          if (task.length) {
+            tasks.push(task);
+          }
+        }
+      }
+
+      const tasksArr = tasks.flat();
+      return res.json({ tasksArr });
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
+  }
+
   async getTasksBySelectedDate(req: Request, res: Response) {
     try {
       const { selectedDate } = req.params;
