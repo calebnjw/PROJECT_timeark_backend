@@ -16,7 +16,6 @@ class ProjectController {
     try {
       const { client_id } = req.query;
       // const clientId = mongoose.Types.ObjectId(client_id);
-      // console.log("client id:", client_id);
       if (client_id) {
         const client: any = await Client.findById(client_id).populate(
           "project_ids"

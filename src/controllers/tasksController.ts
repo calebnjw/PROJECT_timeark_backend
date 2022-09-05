@@ -2,7 +2,9 @@ import { Request, Response } from "express";
 import { isObjectIdOrHexString, Model } from "mongoose";
 import ITasks from "../interfaces/task";
 import Project from "../models/project";
+import Client from "../models/client";
 import Task from "../models/task";
+import ClientController from "./clientController";
 
 class TaskController {
   public model: Model<ITasks>;
@@ -59,11 +61,10 @@ class TaskController {
   async getTasksBySelectedDate(req: Request, res: Response) {
     try {
       const { selectedDate } = req.params;
-      // Get current user id from params, the get all users client_ids list, To be added
-      const clientList = [
-        "62fe4390abda69110eda75e5",
-        "62fe4974f2fbc95a483cb11c",
-      ];
+      const { user_id } = req.query;
+      console.log("user id: ", user_id);
+      const getUserClients = await Client.find({ user_id: user_id });
+      const clientList = getUserClients.map((c) => c._id);
 
       // Get projects by Client ID
       let projects = [];
