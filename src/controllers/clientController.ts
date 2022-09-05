@@ -14,9 +14,7 @@ class ClientController {
   async getClients(request: Request, response: Response) {
     try {
       const { user_id } = request.query;
-      console.log("user id:", user_id);
       const data = await this.model.find({ user_id: user_id });
-      console.log(data);
       if (data) {
         return response.status(200).json(data);
       } else {

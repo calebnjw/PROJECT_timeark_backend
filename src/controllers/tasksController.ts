@@ -15,7 +15,6 @@ class TaskController {
   async getAllTasks(req: Request, res: Response) {
     try {
       const { project_id } = req.query;
-      console.log("project id: ", project_id);
       const project: any = await Project.findById(project_id).populate(
         "task_ids"
       );
@@ -126,10 +125,11 @@ class TaskController {
         startDate: new Date(),
       };
       task?.time_trackings.push(newTimeTracking);
-      task?.save();
+      await task?.save();
       const time_trackingsArr: any = task?.time_trackings;
       const newTimeTrackingId =
         time_trackingsArr[time_trackingsArr.length - 1]._id;
+
       return res.json({ newTimeTrackingId, task });
     } catch (error) {
       console.log("Error message: ", error);
@@ -140,18 +140,24 @@ class TaskController {
     try {
       const { id, timetracking_id } = req.params;
       const task = await this.model.findById(id);
+
       const time_tracking = task?.time_trackings.find(
         (t) => t._id == timetracking_id
       );
 
       if (!time_tracking?.endDate) {
         console.debug("no date found");
-        const updatedTask = await Task.updateOne(
+        const updatedTask = await this.model.updateOne(
           { _id: id },
           { $set: { "time_trackings.$[element].endDate": new Date() } },
           { arrayFilters: [{ "element._id": timetracking_id }] }
         );
-        return res.json({ msg: "end date added", updatedTask });
+
+        await task?.save();
+        const getUpdatedTask = await this.model.findById(id);
+        console.log("updated task: ", getUpdatedTask);
+
+        return res.json({ msg: "end date added", getUpdatedTask });
       } else {
         console.info("date found");
         return res.json({ msg: "end date already exists" });
