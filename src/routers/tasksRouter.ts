@@ -18,7 +18,14 @@ export default class TasksRouter {
         "/time/:selectedDate",
         this.controller.getTasksBySelectedDate.bind(this.controller)
       )
-      .post("/time/new", this.controller.addNewTime.bind(this.controller));
+      .post(
+        "/:id/timetrackings",
+        this.controller.addTimeTracking.bind(this.controller)
+      )
+      .post(
+        "/:id/timetrackings/:timetracking_id/stop",
+        this.controller.stopTimeTracking.bind(this.controller)
+      );
     // .delete("/:id", this.controller.deleteTask.bind(this.controller));
 
     return router;

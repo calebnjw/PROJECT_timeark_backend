@@ -3,6 +3,7 @@ import { Model } from "mongoose";
 import IProjects from "../interfaces/project";
 import IClients from "../interfaces/client";
 import Client from "../models/client";
+import Project from "../models/project";
 import mongoose from "mongoose";
 
 class ProjectController {
@@ -15,7 +16,6 @@ class ProjectController {
     try {
       const { client_id } = req.query;
       // const clientId = mongoose.Types.ObjectId(client_id);
-      // console.log("client id:", client_id);
       if (client_id) {
         const client: any = await Client.findById(client_id).populate(
           "project_ids"
@@ -23,17 +23,8 @@ class ProjectController {
         const projects = client.project_ids;
         return res.json({ projects });
       } else {
-        return res.json({ msg: "no project found" });
+        return res.json({ msg: "client_id missing" });
       }
-    } catch (error) {
-      console.log("Error message: ", error);
-    }
-  }
-
-  async AllProjects(req: Request, res: Response) {
-    try {
-      const allProjects = await this.model.find();
-      return res.json({ allProjects });
     } catch (error) {
       console.log("Error message: ", error);
     }
@@ -56,7 +47,11 @@ class ProjectController {
   async getSingleProject(req: Request, res: Response) {
     try {
       const project = await this.model.findById(req.params.id);
-      return res.json({ project });
+      if (project) {
+        return res.json({ project });
+      } else {
+        return res.json({ msg: "no project created!" });
+      }
     } catch (error) {
       console.log("Error message: ", error);
     }
@@ -70,6 +65,30 @@ class ProjectController {
       );
       console.log("updated Project: ", project);
       return res.json({ msg: "Project updated" });
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
+  }
+
+  async getUsersAllProjects(req: Request, res: Response) {
+    try {
+      const { user_id } = req.query;
+      const clients = await Client.find({ user_id: user_id }).populate(
+        "project_ids"
+      );
+      const getProjects = clients.map((c) => {
+        return c.project_ids;
+      });
+
+      const projects = getProjects.flat();
+      if (projects.length) {
+        return res.json({
+          msg: "request all user's projects received",
+          projects,
+        });
+      } else {
+        return res.json({ msg: "User has no project" });
+      }
     } catch (error) {
       console.log("Error message: ", error);
     }

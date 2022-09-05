@@ -49,6 +49,10 @@ const ClientSchema: Schema<IClients> = new Schema(
         ref: "Project",
       },
     ],
+    user_id: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   {
     timestamps: true,

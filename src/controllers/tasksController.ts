@@ -1,7 +1,15 @@
+<<<<<<< HEAD
 import { request, Request, Response } from "express";
 import { Model } from "mongoose";
+=======
+import { Request, Response } from "express";
+import { isObjectIdOrHexString, Model } from "mongoose";
+>>>>>>> dce5ae5605ed64453334e2d51e622ad283a8b62c
 import ITasks from "../interfaces/task";
 import Project from "../models/project";
+import Client from "../models/client";
+import Task from "../models/task";
+import ClientController from "./clientController";
 
 class TaskController {
   public model: Model<ITasks>;
@@ -31,7 +39,7 @@ class TaskController {
       const newTask = await this.model.create({ ...req.body });
       project.task_ids.push(newTask.id);
       await project.save();
-      return res.json({ msg: "Added new task" });
+      return res.json({ msg: "Added new task", newTask });
     } catch (error) {
       console.log("Error message: ", error);
     }
@@ -108,14 +116,10 @@ class TaskController {
   async getTasksBySelectedDate(req: Request, res: Response) {
     try {
       const { selectedDate } = req.params;
-      // Get current user id from params, the get all users client_ids list, To be added
-      const clientList = [
-        "62fe4390abda69110eda75e5",
-        "62fe48248afea2260d3a178d",
-        "62fe4974f2fbc95a483cb11c",
-        "6303868c92a52dcf23bcc860",
-        "6303869c92a52dcf23bcc863",
-      ];
+      const { user_id } = req.query;
+      console.log("user id: ", user_id);
+      const getUserClients = await Client.find({ user_id: user_id });
+      const clientList = getUserClients.map((c) => c._id);
 
       // Get projects by Client ID
       let projects = [];
@@ -151,11 +155,11 @@ class TaskController {
 
       // Sort out tasks by selected date
       const tasksBySelectedDate = tasksArr.filter((task) => {
-        let temp = task.time_tracking.filter(
-          (time) => formatDate(time.date) === selectedDate
+        let temp = task.time_trackings.filter(
+          (time) => formatDate(time.startDate) === selectedDate
         );
         if (temp.length) {
-          return (task.time_tracking = temp);
+          return (task.time_trackings = temp);
         }
       });
 
@@ -169,19 +173,47 @@ class TaskController {
     }
   }
 
-  async addNewTime(req: Request, res: Response) {
+  async addTimeTracking(req: Request, res: Response) {
     try {
-      const { task_id } = req.query;
-      // console.log("task id: ", task_id);
-      const task = await this.model.findById(task_id);
-      // console.log("task: ", task);
-      console.log("body: ", req.body);
-      const newTime = req.body;
-      task?.time_tracking.push(newTime);
+      const { id } = req.params;
+      const task = await this.model.findById(id);
+      const newTimeTracking: any = {
+        startDate: new Date(),
+      };
+      task?.time_trackings.push(newTimeTracking);
       task?.save();
-      return res.json({ task });
+      const time_trackingsArr: any = task?.time_trackings;
+      const newTimeTrackingId =
+        time_trackingsArr[time_trackingsArr.length - 1]._id;
+      return res.json({ newTimeTrackingId, task });
     } catch (error) {
       console.log("Error message: ", error);
+    }
+  }
+
+  async stopTimeTracking(req: Request, res: Response) {
+    try {
+      const { id, timetracking_id } = req.params;
+      const task = await this.model.findById(id);
+      const time_tracking = task?.time_trackings.find(
+        (t) => t._id == timetracking_id
+      );
+
+      if (!time_tracking?.endDate) {
+        console.debug("no date found");
+        const updatedTask = await Task.updateOne(
+          { _id: id },
+          { $set: { "time_trackings.$[element].endDate": new Date() } },
+          { arrayFilters: [{ "element._id": timetracking_id }] }
+        );
+        return res.json({ msg: "end date added", updatedTask });
+      } else {
+        console.info("date found");
+        return res.json({ msg: "end date already exists" });
+      }
+    } catch (error) {
+      console.log("Error message: ", error);
+      return res.status(500).json("Internal server error");
     }
   }
 
