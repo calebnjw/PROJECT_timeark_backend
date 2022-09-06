@@ -61,7 +61,6 @@ class TaskController {
     try {
       const { selectedDate } = req.params;
       const { user_id } = req.query;
-      console.log("user id: ", user_id);
       const getUserClients = await Client.find({ user_id: user_id });
       const clientList = getUserClients.map((c) => c._id);
 
@@ -155,13 +154,68 @@ class TaskController {
 
         await task?.save();
         const getUpdatedTask = await this.model.findById(id);
-        console.log("updated task: ", getUpdatedTask);
 
         return res.json({ msg: "end date added", getUpdatedTask });
       } else {
         console.info("date found");
         return res.json({ msg: "end date already exists" });
       }
+    } catch (error) {
+      console.log("Error message: ", error);
+      return res.status(500).json("Internal server error");
+    }
+  }
+
+  async updateTimeTracking(req: Request, res: Response) {
+    try {
+      const { id, timetracking_id } = req.params;
+      const { updatedTimeSpent } = req.body;
+      console.log(
+        "task id: ",
+        id,
+        "time tracking id: ",
+        timetracking_id,
+        "updated time spent: ",
+        updatedTimeSpent
+      );
+      const task = await this.model.findById(id);
+      // console.log("current task: ", task);
+
+      const time_tracking = task?.time_trackings.find(
+        (t) => t._id == timetracking_id
+      );
+      // update time tracking endDate:
+      const currentEndDate: any = time_tracking?.endDate;
+      // console.log("time tracking currentEndDate: ", currentEndDate);
+
+      const msSinceEpoch = new Date(currentEndDate).getTime();
+      const updatedEndDate = new Date(msSinceEpoch + 2.5 * 60 * 60 * 1000);
+      // console.log("time tracking updatedEndDate: ", updatedEndDate);
+
+      const updatedTask = await this.model.updateOne(
+        { _id: id },
+        { $set: { "time_trackings.$[element].endDate": updatedEndDate } },
+        { arrayFilters: [{ "element._id": timetracking_id }] }
+      );
+
+      await task?.save();
+      const getUpdatedTask = await this.model.findById(id);
+
+      // console.log("updated task: ", getUpdatedTask);
+
+      return res.json({ msg: "request received", getUpdatedTask });
+    } catch (error) {
+      console.log("Error message: ", error);
+      return res.status(500).json("Internal server error");
+    }
+  }
+
+  async deleteTimeTracking(req: Request, res: Response) {
+    try {
+      const { id, timetracking_id } = req.params;
+      console.log("task id: ", id, "time tracking id: ", timetracking_id);
+
+      return res.json({ msg: "request received" });
     } catch (error) {
       console.log("Error message: ", error);
       return res.status(500).json("Internal server error");
