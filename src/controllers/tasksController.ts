@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
-import { isObjectIdOrHexString, Model } from "mongoose";
+import { Model } from "mongoose";
 import ITasks from "../interfaces/task";
 import Project from "../models/project";
 import Client from "../models/client";
 import Task from "../models/task";
 import ClientController from "./clientController";
+import timeConversion from "../scripts/timeConversion";
 
 class TaskController {
   public model: Model<ITasks>;
@@ -82,8 +83,66 @@ class TaskController {
         }
       }
 
-      const tasksArr = tasks.flat();
-      return res.json({ tasksArr });
+      const tasksArray = tasks.flat();
+      const timeArray: any = [];
+
+      tasksArray.map((t) => {
+        let timeTaken: number = 0;
+        t.time_trackings.map((e: any, idx) => {
+          timeTaken += e.endDate - e.startDate;
+          timeArray.push({ t, timeTaken });
+        });
+      });
+
+      const ProjectTime: any = [];
+      for (let i = 0; i < timeArray.length; i += 1) {
+        ProjectTime.push({
+          project_id: timeArray[i].t.project_id,
+          timetaken: timeArray[i].timeTaken,
+        });
+      }
+
+      function removeDuplicates(projectArr: any) {
+        let newArr = [...projectArr];
+        // console.log(newArr);
+        for (let i = 0; i < newArr.length; i += 1) {
+          let temp = newArr[i];
+          console.log("temp", temp);
+          for (let j = i + 1; j < newArr.length; j += 1) {
+            console.log("new", newArr[j]);
+            if (temp.project_id === newArr[j].project_id) {
+              let currentToken = temp.timetaken;
+              let token = newArr[j].timetaken;
+              newArr.splice(j, 1);
+              console.log(newArr);
+              let newToken = currentToken + token;
+              temp.timetaken = newToken;
+            }
+          }
+        }
+        return newArr;
+      }
+
+      const filteredList = removeDuplicates(ProjectTime);
+      // console.log(filteredList);
+      const projectsList = projects.flat();
+
+      // function removeDuplicates(array) {
+      //   const result = [];
+      //   const map = {};
+
+      //   for (let i = 0; i < array.length; i++) {
+      //     if (map[array[i]]) {
+      //       continue;
+      //     } else {
+      //       result.push(array[i]);
+      //       map[array[i]] = true;
+      //     }
+      //   }
+      //   return result;
+      // }
+
+      res.json({ tasksArray });
     } catch (error) {
       console.log("Error message: ", error);
     }
