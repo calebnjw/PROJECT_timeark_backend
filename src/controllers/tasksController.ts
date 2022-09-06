@@ -116,6 +116,27 @@ class TaskController {
     }
   }
 
+  async getSingleTimeTracking(req: Request, res: Response) {
+    try {
+      const { id, timetracking_id } = req.params;
+      // console.log("task id: ", id, "time tracking id: ", timetracking_id);
+      const task = await this.model.findById(id);
+      const time_tracking = task?.time_trackings.find(
+        (t) => t._id == timetracking_id
+      );
+
+      // console.log(task, time_tracking);
+
+      return res.json({
+        msg: "show single time tracking",
+        task,
+        time_tracking,
+      });
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
+  }
+
   async addTimeTracking(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -213,9 +234,23 @@ class TaskController {
   async deleteTimeTracking(req: Request, res: Response) {
     try {
       const { id, timetracking_id } = req.params;
-      console.log("task id: ", id, "time tracking id: ", timetracking_id);
+      // console.log("task id: ", id, "time tracking id: ", timetracking_id);
+      // const task = await this.model.findById(id);
+      // console.log("current task: ", task);
 
-      return res.json({ msg: "request received" });
+      const result = await this.model.updateOne(
+        { _id: id },
+        {
+          $pull: {
+            time_trackings: { _id: timetracking_id },
+          },
+        }
+      );
+
+      const getUpdatedTask = await this.model.findById(id);
+      console.log("updated task: ", getUpdatedTask);
+
+      return res.json({ msg: "time tracking record removed!" });
     } catch (error) {
       console.log("Error message: ", error);
       return res.status(500).json("Internal server error");

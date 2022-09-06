@@ -17,6 +17,10 @@ export default class TasksRouter {
         "/time/:selectedDate",
         this.controller.getTasksBySelectedDate.bind(this.controller)
       )
+      .get(
+        "/:id/timetrackings/:timetracking_id",
+        this.controller.getSingleTimeTracking.bind(this.controller)
+      )
       .post(
         "/:id/timetrackings",
         this.controller.addTimeTracking.bind(this.controller)
