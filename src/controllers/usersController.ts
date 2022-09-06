@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from "express";
 import { Model } from "mongoose";
 
 import IUsers from "../interfaces/user";
-import UserModel from "../models/user";
+import UserModel from "../models/users";
 
 const SALT = Number(process.env.SALT_ROUNDS);
 const FRONTEND_URL = process.env.FRONTEND_URL;
@@ -43,24 +43,20 @@ class UserController {
           .json({ success: false, message: "User not found." });
       }
     } else {
-      return response
-        .status(401)
-        .json({
-          success: false,
-          message: "Session expired, please login again.",
-        });
+      return response.status(401).json({
+        success: false,
+        message: "Session expired, please login again.",
+      });
     }
   }
 
   async updateUser(request: Request, response: Response) {
     if (request.user) {
     } else {
-      return response
-        .status(401)
-        .json({
-          success: false,
-          message: "Session expired, please login again.",
-        });
+      return response.status(401).json({
+        success: false,
+        message: "Session expired, please login again.",
+      });
     }
   }
 
@@ -86,12 +82,10 @@ class UserController {
         response.status(500).json({ success: false, message: error });
       }
     } else {
-      return response
-        .status(401)
-        .json({
-          success: false,
-          message: "Session expired, please login again.",
-        });
+      return response.status(401).json({
+        success: false,
+        message: "Session expired, please login again.",
+      });
     }
   }
 }
