@@ -114,7 +114,6 @@ class TaskController {
               let currentToken = temp.timetaken;
               let token = newArr[j].timetaken;
               newArr.splice(j, 1);
-              console.log(newArr);
               let newToken = currentToken + token;
               temp.timetaken = newToken;
             }

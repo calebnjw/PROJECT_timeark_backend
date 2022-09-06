@@ -15,7 +15,6 @@ class ProjectController {
   async getAllProjects(req: Request, res: Response) {
     try {
       const { client_id } = req.query;
-      // const clientId = mongoose.Types.ObjectId(client_id);
       if (client_id) {
         const client: any = await Client.findById(client_id).populate(
           "project_ids"
