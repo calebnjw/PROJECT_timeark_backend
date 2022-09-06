@@ -147,7 +147,7 @@ class TaskController {
         ) {
           nameTimeArray.push({
             name: projectsList[i].name,
-            timetaken: filteredList[i].timetaken,
+            timetaken: timeConversion(filteredList[i].timetaken),
           });
         }
       }
