@@ -3,15 +3,15 @@ import passportLocalMongoose from "passport-local-mongoose";
 import IUsers from "../interfaces/user";
 
 const BillingSchema: Schema = new Schema({
-  company_name: String,
-  building_name: String,
-  unit_number: String,
-  street_name: String,
+  companyName: String,
+  buildingName: String,
+  unitNumber: String,
+  streetName: String,
   city: String,
   country: String,
-  postal_code: String,
-  contact_number: String,
-  company_registration: String,
+  postalCode: String,
+  contactNumber: String,
+  companyRegistration: String,
 });
 
 const NameSchema: Schema = new Schema({

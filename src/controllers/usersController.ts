@@ -1,11 +1,11 @@
 import bcrypt from "bcrypt";
 
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { Model } from "mongoose";
 
 import IUsers from "../interfaces/user";
-import UserModel from "../models/users";
 
+const EXPIRED_MESSAGE = "Session expired, please login again.";
 const SALT = Number(process.env.SALT_ROUNDS);
 const FRONTEND_URL = process.env.FRONTEND_URL;
 
@@ -19,48 +19,54 @@ class UserController {
   async logUser(request: Request, response: Response) {
     console.log("REQUEST.USER", request.user);
     console.log("REQUEST.SESSION", request.session);
-
-    if (request.user) {
-      return response.status(200).redirect(`${FRONTEND_URL}/login`);
-    } else {
-      return response.status(401).redirect(`${FRONTEND_URL}/login`);
-    }
+    return response.redirect(`${FRONTEND_URL}/login`);
   }
 
   async getUser(request: Request, response: Response) {
     if (request.user) {
-      const { id } = request.user;
+      const { id, newUser } = request.user;
 
       try {
-        const user = await this.model.findOne({ id });
-
-        response
-          .status(200)
-          .json({ success: true, message: "User found.", user });
+        const user = await this.model.findOne({ _id: id });
+        response.status(200).json({ success: true, user, newUser });
       } catch (error) {
-        response
-          .status(404)
-          .json({ success: false, message: "User not found." });
+        response.status(404).json({ success: false });
       }
     } else {
-      return response.status(401).json({
-        success: false,
-        message: "Session expired, please login again.",
-      });
+      return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
     }
   }
 
   async updateUser(request: Request, response: Response) {
+    const { updatedProfile } = request.body;
     if (request.user) {
+      try {
+        console.log("SAVING!");
+        const updated = await this.model.updateOne(
+          {
+            _id: request.user.id,
+          },
+          updatedProfile,
+          {
+            runValidators: true,
+          }
+        );
+        console.log("UPDATED", updated);
+
+        if (request.user.newUser) {
+          request.user.newUser = false;
+        }
+        response.status(200).json({ success: updated.acknowledged });
+      } catch (error) {
+        console.error();
+        response.status(500).json({ success: false, message: error });
+      }
     } else {
-      return response.status(401).json({
-        success: false,
-        message: "Session expired, please login again.",
-      });
+      return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
     }
   }
 
-  async logout(request: Request, response: Response) {
+  async logoutUser(request: Request, response: Response) {
     // if user session exists
     if (request.user) {
       try {
@@ -82,10 +88,36 @@ class UserController {
         response.status(500).json({ success: false, message: error });
       }
     } else {
-      return response.status(401).json({
-        success: false,
-        message: "Session expired, please login again.",
-      });
+      return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
+    }
+  }
+
+  async deleteUser(request: Request, response: Response) {
+    if (request.user) {
+      console.log(request.user);
+      try {
+        // delete user data
+        // TODO: Cannot just delete account, must delete all other content associated with the same ID.
+        const deleted = await this.model.deleteOne({ _id: request.user.id });
+        console.log("DELETED", deleted);
+        // then do a logout
+        request.session.regenerate((error) => {
+          if (error) console.error("REGENERATE ERROR");
+        });
+        request.logout((error) => {
+          if (error) console.error("LOGOUT ERROR");
+        });
+        request.session.destroy((error) => {
+          if (error) console.error("SESSION ERROR");
+        });
+
+        return response.status(200).json({ success: deleted.acknowledged });
+      } catch (error: any) {
+        console.error();
+        response.status(500).json({ success: false, message: error });
+      }
+    } else {
+      return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
     }
   }
 }
