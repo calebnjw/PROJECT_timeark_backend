@@ -223,10 +223,16 @@ class TaskController {
 
       await task?.save();
       const getUpdatedTask = await this.model.findById(id);
+      const updatedTimeTracking = task?.time_trackings.find(
+        (t) => t._id == timetracking_id
+      );
 
       // console.log("updated task: ", getUpdatedTask);
 
-      return res.json({ msg: "request received", getUpdatedTask });
+      return res.json({
+        msg: "request received",
+        updatedTimeTracking,
+      });
     } catch (error) {
       console.log("Error message: ", error);
       return res.status(500).json("Internal server error");
