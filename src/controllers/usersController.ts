@@ -1,11 +1,11 @@
 import bcrypt from "bcrypt";
 
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { Model } from "mongoose";
 
 import IUsers from "../interfaces/user";
-import UserModel from "../models/users";
 
+const EXPIRED_MESSAGE = "Session expired, please login again.";
 const SALT = Number(process.env.SALT_ROUNDS);
 const FRONTEND_URL = process.env.FRONTEND_URL;
 
@@ -19,37 +19,26 @@ class UserController {
   async logUser(request: Request, response: Response) {
     console.log("REQUEST.USER", request.user);
     console.log("REQUEST.SESSION", request.session);
-
-    if (request.user) {
-      return response.status(200).redirect(`${FRONTEND_URL}/login`);
-    } else {
-      return response.status(401).redirect(`${FRONTEND_URL}/login`);
-    }
+    return response.redirect(`${FRONTEND_URL}/login`);
   }
 
   async getUser(request: Request, response: Response) {
     if (request.user) {
-      const { id } = request.user;
+      const { id, newUser } = request.user;
 
       try {
         const user = await this.model.findOne({ _id: id });
-        console.log(user);
-
-        response.status(200).json({ success: true, message: "User found.", user });
+        response.status(200).json({ success: true, user, newUser });
       } catch (error) {
-        response.status(404).json({ success: false, message: "User not found." });
+        response.status(404).json({ success: false });
       }
     } else {
-      return response
-        .status(401)
-        .json({ success: false, message: "Session expired, please login again." });
+      return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
     }
   }
 
   async updateUser(request: Request, response: Response) {
     const { updatedProfile } = request.body;
-    console.log("REQUEST.BODY", updatedProfile);
-
     if (request.user) {
       try {
         console.log("SAVING!");
@@ -57,18 +46,23 @@ class UserController {
           {
             _id: request.user.id,
           },
-          updatedProfile
+          updatedProfile,
+          {
+            runValidators: true,
+          }
         );
         console.log("UPDATED", updated);
+
+        if (request.user.newUser) {
+          request.user.newUser = false;
+        }
         response.status(200).json({ success: updated.acknowledged });
       } catch (error) {
         console.error();
         response.status(500).json({ success: false, message: error });
       }
     } else {
-      return response
-        .status(401)
-        .json({ success: false, message: "Session expired, please login again." });
+      return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
     }
   }
 
@@ -94,9 +88,7 @@ class UserController {
         response.status(500).json({ success: false, message: error });
       }
     } else {
-      return response
-        .status(401)
-        .json({ success: false, message: "Session expired, please login again." });
+      return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
     }
   }
 
@@ -125,9 +117,7 @@ class UserController {
         response.status(500).json({ success: false, message: error });
       }
     } else {
-      return response
-        .status(401)
-        .json({ success: false, message: "Session expired, please login again." });
+      return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
     }
   }
 }
