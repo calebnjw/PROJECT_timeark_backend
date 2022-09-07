@@ -45,6 +45,8 @@ passport.use(
           name: profile.name,
           emails: profile.emails,
           photos: profile.photos,
+          billingDetails: {},
+          clientIds: [],
         });
         user.newUser = true; // TODO: if new user is true, login page should redirect to profile creation page
       } else {

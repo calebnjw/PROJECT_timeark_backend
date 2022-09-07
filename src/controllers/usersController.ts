@@ -32,7 +32,8 @@ class UserController {
       const { id } = request.user;
 
       try {
-        const user = await this.model.findOne({ id });
+        const user = await this.model.findOne({ _id: id });
+        console.log(user);
 
         response.status(200).json({ success: true, message: "User found.", user });
       } catch (error) {
@@ -46,7 +47,25 @@ class UserController {
   }
 
   async updateUser(request: Request, response: Response) {
+    const { updatedProfile } = request.body;
+    console.log("REQUEST.BODY", updatedProfile);
+
     if (request.user) {
+      try {
+        console.log("SAVING!");
+        const updated = await this.model.updateOne(
+          {
+            _id: request.user.id,
+          },
+          updatedProfile
+        );
+        console.log("SAVED!");
+        console.log("UPDATED", updated);
+        response.status(200).json({ success: true });
+      } catch (error) {
+        console.error();
+        response.status(500).json({ success: false, message: error });
+      }
     } else {
       return response
         .status(401)
@@ -54,7 +73,7 @@ class UserController {
     }
   }
 
-  async logout(request: Request, response: Response) {
+  async logoutUser(request: Request, response: Response) {
     // if user session exists
     if (request.user) {
       try {
@@ -71,6 +90,37 @@ class UserController {
           if (error) console.error("SESSION ERROR");
           response.status(200).redirect(`${FRONTEND_URL}/login`);
         });
+      } catch (error: any) {
+        console.error();
+        response.status(500).json({ success: false, message: error });
+      }
+    } else {
+      return response
+        .status(401)
+        .json({ success: false, message: "Session expired, please login again." });
+    }
+  }
+
+  async deleteUser(request: Request, response: Response) {
+    if (request.user) {
+      console.log(request.user);
+      try {
+        // delete user data
+        // TODO: Cannot just delete account, must delete all other content associated with the same ID.
+        const deleted = await this.model.deleteOne({ _id: request.user.id });
+        console.log("DELETED", deleted);
+        // then do a logout
+        request.session.regenerate((error) => {
+          if (error) console.error("REGENERATE ERROR");
+        });
+        request.logout((error) => {
+          if (error) console.error("LOGOUT ERROR");
+        });
+        request.session.destroy((error) => {
+          if (error) console.error("SESSION ERROR");
+        });
+
+        return response.status(200).json({ success: deleted.acknowledged });
       } catch (error: any) {
         console.error();
         response.status(500).json({ success: false, message: error });
