@@ -103,45 +103,58 @@ class TaskController {
       }
 
       function removeDuplicates(projectArr: any) {
+        // shallow copy of project Arr
         let newArr = [...projectArr];
-        // console.log(newArr);
+        // loop through newArr
         for (let i = 0; i < newArr.length; i += 1) {
+          // let the first element be temp so that we can compare
           let temp = newArr[i];
-          console.log("temp", temp);
+          // console.log("temp", temp.project_id);
+          // start another loop
           for (let j = i + 1; j < newArr.length; j += 1) {
-            console.log("new", newArr[j]);
-            if (temp.project_id === newArr[j].project_id) {
+            // console.log("new", newArr[j].project_id);
+            // console.log(temp.projectid == newArr[j].project_id);
+            // if first item project id is equal to 2nd item project id
+            if (toString(temp.project_id) === toString(newArr[j].project_id)) {
+              // get the timetaken for the first item
               let currentToken = temp.timetaken;
+              // get the time taken for the second item
               let token = newArr[j].timetaken;
+              // remove the second item via splice
               newArr.splice(j, 1);
+              // get a new total for item 1 time
               let newToken = currentToken + token;
+              // assign the new total time to the first index
               temp.timetaken = newToken;
             }
           }
         }
+        // return back new Array
         return newArr;
       }
 
       const filteredList = removeDuplicates(ProjectTime);
       // console.log(filteredList);
       const projectsList = projects.flat();
+      // console.log(projectsList);
 
-      // function removeDuplicates(array) {
-      //   const result = [];
-      //   const map = {};
+      const nameTimeArray: any = [];
 
-      //   for (let i = 0; i < array.length; i++) {
-      //     if (map[array[i]]) {
-      //       continue;
-      //     } else {
-      //       result.push(array[i]);
-      //       map[array[i]] = true;
-      //     }
-      //   }
-      //   return result;
-      // }
+      // loop through filtered list
+      for (let i = 0; i < projectsList.length; i += 1) {
+        if (
+          toString(projectsList[i]._id) === toString(filteredList[i].project_id)
+        ) {
+          nameTimeArray.push({
+            name: projectsList[i].name,
+            value: timeConversion(filteredList[i].timetaken),
+          });
+        }
+      }
 
-      res.json({ tasksArray });
+      // console.log(nameTimeArray);
+
+      res.json({ nameTimeArray });
     } catch (error) {
       console.log("Error message: ", error);
     }
