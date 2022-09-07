@@ -223,11 +223,11 @@ class TaskController {
 
       await task?.save();
       const getUpdatedTask = await this.model.findById(id);
-      const updatedTimeTracking = task?.time_trackings.find(
+      const updatedTimeTracking = getUpdatedTask?.time_trackings.find(
         (t) => t._id == timetracking_id
       );
 
-      // console.log("updated task: ", getUpdatedTask);
+      console.log("updated task: ", updatedTimeTracking);
 
       return res.json({
         msg: "request received",
