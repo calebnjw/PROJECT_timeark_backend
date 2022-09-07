@@ -59,9 +59,8 @@ class UserController {
           },
           updatedProfile
         );
-        console.log("SAVED!");
         console.log("UPDATED", updated);
-        response.status(200).json({ success: true });
+        response.status(200).json({ success: updated.acknowledged });
       } catch (error) {
         console.error();
         response.status(500).json({ success: false, message: error });
