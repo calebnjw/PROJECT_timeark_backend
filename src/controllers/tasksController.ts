@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
-import { isObjectIdOrHexString, Model } from "mongoose";
+import { Model } from "mongoose";
 import ITasks from "../interfaces/task";
 import Project from "../models/project";
 import Client from "../models/client";
 import Task from "../models/task";
 import ClientController from "./clientController";
+import timeConversion from "../scripts/timeConversion";
 
 class TaskController {
   public model: Model<ITasks>;
@@ -15,6 +16,7 @@ class TaskController {
   async getAllTasks(req: Request, res: Response) {
     try {
       const { project_id } = req.query;
+      console.log("project id: ", project_id);
       const project: any = await Project.findById(project_id).populate(
         "task_ids"
       );
@@ -52,6 +54,107 @@ class TaskController {
     try {
       const task = await this.model.findByIdAndUpdate(req.params.id, req.body);
       return res.json({ msg: "Task updated" });
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
+  }
+
+  async getTasksByProject(req: Request, res: Response) {
+    const { user_id } = req.query;
+    try {
+      const getUserClients = await Client.find({ user_id: user_id });
+      const clientList = getUserClients.map((c) => c._id);
+
+      // Get projects by Client ID
+      let projects = [];
+      for (let i = 0; i < clientList.length; i++) {
+        let project = await Project.find({ client_id: clientList[i] });
+        projects.push(project);
+      }
+
+      // Get tasks by project ID
+      let tasks = [];
+      for (let i = 0; i < projects.length; i++) {
+        for (let j = 0; j < projects[i].length; j++) {
+          let task = await this.model.find({ project_id: projects[i][j]._id });
+          if (task.length) {
+            tasks.push(task);
+          }
+        }
+      }
+
+      const tasksArray = tasks.flat();
+      const timeArray: any = [];
+
+      tasksArray.map((t) => {
+        let timeTaken: number = 0;
+        t.time_trackings.map((e: any, idx) => {
+          timeTaken += e.endDate - e.startDate;
+          timeArray.push({ t, timeTaken });
+        });
+      });
+
+      const ProjectTime: any = [];
+      for (let i = 0; i < timeArray.length; i += 1) {
+        ProjectTime.push({
+          project_id: timeArray[i].t.project_id,
+          timetaken: timeArray[i].timeTaken,
+        });
+      }
+
+      function removeDuplicates(projectArr: any) {
+        // shallow copy of project Arr
+        let newArr = [...projectArr];
+        // loop through newArr
+        for (let i = 0; i < newArr.length; i += 1) {
+          // let the first element be temp so that we can compare
+          let temp = newArr[i];
+          // console.log("temp", temp.project_id);
+          // start another loop
+          for (let j = i + 1; j < newArr.length; j += 1) {
+            // console.log("new", newArr[j].project_id);
+            // console.log(temp.projectid == newArr[j].project_id);
+            // if first item project id is equal to 2nd item project id
+            if (toString(temp.project_id) === toString(newArr[j].project_id)) {
+              // get the timetaken for the first item
+              let currentToken = temp.timetaken;
+              // get the time taken for the second item
+              let token = newArr[j].timetaken;
+              // remove the second item via splice
+              newArr.splice(j, 1);
+              // get a new total for item 1 time
+              let newToken = currentToken + token;
+              // assign the new total time to the first index
+              temp.timetaken = newToken;
+            }
+          }
+        }
+        // return back new Array
+        return newArr;
+      }
+
+      const filteredList = removeDuplicates(ProjectTime);
+      // console.log(filteredList);
+      const projectsList = projects.flat();
+      // console.log(projectsList);
+
+      const nameTimeArray: any = [];
+
+      // loop through filtered list
+      for (let i = 0; i < projectsList.length; i += 1) {
+        if (
+          toString(projectsList[i]._id) === toString(filteredList[i].project_id)
+        ) {
+          nameTimeArray.push({
+            name: projectsList[i].name,
+            value: timeConversion(filteredList[i].timetaken),
+          });
+        }
+      }
+
+      // console.log(nameTimeArray);
+
+      res.json({ nameTimeArray });
     } catch (error) {
       console.log("Error message: ", error);
     }
@@ -145,11 +248,10 @@ class TaskController {
         startDate: new Date(),
       };
       task?.time_trackings.push(newTimeTracking);
-      await task?.save();
+      task?.save();
       const time_trackingsArr: any = task?.time_trackings;
       const newTimeTrackingId =
         time_trackingsArr[time_trackingsArr.length - 1]._id;
-
       return res.json({ newTimeTrackingId, task });
     } catch (error) {
       console.log("Error message: ", error);
@@ -160,19 +262,17 @@ class TaskController {
     try {
       const { id, timetracking_id } = req.params;
       const task = await this.model.findById(id);
-
       const time_tracking = task?.time_trackings.find(
         (t) => t._id == timetracking_id
       );
 
       if (!time_tracking?.endDate) {
         console.debug("no date found");
-        const updatedTask = await this.model.updateOne(
+        const updatedTask = await Task.updateOne(
           { _id: id },
           { $set: { "time_trackings.$[element].endDate": new Date() } },
           { arrayFilters: [{ "element._id": timetracking_id }] }
         );
-
         await task?.save();
         const getUpdatedTask = await this.model.findById(id);
 
