@@ -6,6 +6,7 @@ import Client from "../models/client";
 import Task from "../models/task";
 import ClientController from "./clientController";
 import timeConversion from "../scripts/timeConversion";
+import { startOfWeek, endOfWeek } from "date-fns";
 
 class TaskController {
   public model: Model<ITasks>;
@@ -152,9 +153,50 @@ class TaskController {
         }
       }
 
-      // console.log(nameTimeArray);
-
       res.json({ nameTimeArray });
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
+  }
+
+  async getTaskByWeek(req: Request, res: Response) {
+    const { user_id } = req.query;
+    try {
+      const getUserClients = await Client.find({ user_id: user_id });
+      const clientList = getUserClients.map((c) => c._id);
+
+      // Get projects by Client ID
+      let projects = [];
+      for (let i = 0; i < clientList.length; i++) {
+        let project = await Project.find({ client_id: clientList[i] });
+        projects.push(project);
+      }
+
+      // Get tasks by project ID
+      let tasks = [];
+      for (let i = 0; i < projects.length; i++) {
+        for (let j = 0; j < projects[i].length; j++) {
+          let task = await this.model.find({ project_id: projects[i][j]._id });
+          if (task.length) {
+            tasks.push(task);
+          }
+        }
+      }
+      const tasksArray = tasks.flat();
+      const timeArray: any = [];
+
+      // tasksArray.map((t) => {
+
+      // let timeTaken: number = 0;
+      // t.time_trackings.map((e: any, idx) => {
+      // timeTaken += e.endDate - e.startDate;
+      // timeArray.push({ t, timeTaken });
+      // });
+      // });
+
+      console.log(startOfWeek(new Date()));
+      console.log(endOfWeek(new Date()));
+      res.json({ tasksArray });
     } catch (error) {
       console.log("Error message: ", error);
     }
