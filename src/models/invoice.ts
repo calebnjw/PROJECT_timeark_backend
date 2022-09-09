@@ -11,10 +11,18 @@ const InvoiceSchema: Schema = new Schema(
       type: Boolean,
       required: true,
     },
+    issuedDate: {
+      type: Date,
+      required: true,
+    },
     overdue: {
       type: Boolean,
       required: true,
     },
+    month: {
+      type: String,
+      required: true,
+    }
   },
   {
     timestamps: true,
