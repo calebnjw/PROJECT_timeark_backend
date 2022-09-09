@@ -63,6 +63,7 @@ class TaskController {
 
   async getTaskByTime(req: Request, res: Response) {
     const { user_id, time_period } = req.query;
+    console.log("loading piechart data for ", time_period);
     try {
       const getUserClients = await Client.find({ user_id: user_id });
       const clientList = getUserClients.map((c) => c._id);
