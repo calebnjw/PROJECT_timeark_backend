@@ -18,3 +18,4 @@ export default interface IProjects extends Document {
   ];
   client_id: Types.ObjectId;
 }
+

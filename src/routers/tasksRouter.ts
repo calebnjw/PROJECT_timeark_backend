@@ -10,8 +10,7 @@ export default class TasksRouter {
   routes() {
     router
       .get("/", this.controller.getAllTasks.bind(this.controller))
-      .get("/all", this.controller.getTasksByProject.bind(this.controller))
-      .get("/week", this.controller.getTaskByWeek.bind(this.controller))
+      .get("/time", this.controller.getTasksByTime.bind(this.controller))
       .post("/new", this.controller.createTask.bind(this.controller))
       .get("/:id", this.controller.getSingleTask.bind(this.controller))
       .put("/:id/update", this.controller.updateTask.bind(this.controller))
