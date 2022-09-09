@@ -6,7 +6,8 @@ import Client from "../models/client";
 import Task from "../models/task";
 import ClientController from "./clientController";
 import timeConversion from "../scripts/timeConversion";
-import { startOfWeek, endOfWeek } from "date-fns";
+import { startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
+import enGB from "date-fns/locale/en-GB";
 
 class TaskController {
   public model: Model<ITasks>;
@@ -160,7 +161,7 @@ class TaskController {
   }
 
   async getTaskByWeek(req: Request, res: Response) {
-    const { user_id } = req.query;
+    const { user_id, time_period } = req.query;
     try {
       const getUserClients = await Client.find({ user_id: user_id });
       const clientList = getUserClients.map((c) => c._id);
@@ -174,29 +175,117 @@ class TaskController {
 
       // Get tasks by project ID
       let tasks = [];
-      for (let i = 0; i < projects.length; i++) {
-        for (let j = 0; j < projects[i].length; j++) {
-          let task = await this.model.find({ project_id: projects[i][j]._id });
-          if (task.length) {
-            tasks.push(task);
+
+      if (time_period === "week") {
+        for (let i = 0; i < projects.length; i++) {
+          for (let j = 0; j < projects[i].length; j++) {
+            let task = await this.model.find({
+              project_id: projects[i][j]._id,
+              createdAt: {
+                $gt: startOfWeek(new Date(), { weekStartsOn: 1, locale: enGB }),
+                $lt: endOfWeek(new Date(), { weekStartsOn: 1, locale: enGB }),
+              },
+            });
+            if (task.length) {
+              tasks.push(task);
+            }
+          }
+        }
+      } else if (time_period === "month") {
+        for (let i = 0; i < projects.length; i++) {
+          for (let j = 0; j < projects[i].length; j++) {
+            let task = await this.model.find({
+              project_id: projects[i][j]._id,
+              createdAt: {
+                $gt: startOfMonth(new Date()),
+                $lt: endOfMonth(new Date()),
+              },
+            });
+            if (task.length) {
+              tasks.push(task);
+            }
+          }
+        }
+      } else {
+        for (let i = 0; i < projects.length; i++) {
+          for (let j = 0; j < projects[i].length; j++) {
+            let task = await this.model.find({
+              project_id: projects[i][j]._id,
+            });
+            if (task.length) {
+              tasks.push(task);
+            }
           }
         }
       }
       const tasksArray = tasks.flat();
       const timeArray: any = [];
 
-      // tasksArray.map((t) => {
+      tasksArray.map((t) => {
+        let timeTaken: number = 0;
+        t.time_trackings.map((e: any, idx) => {
+          timeTaken += e.endDate - e.startDate;
+          timeArray.push({ t, timeTaken });
+        });
+      });
 
-      // let timeTaken: number = 0;
-      // t.time_trackings.map((e: any, idx) => {
-      // timeTaken += e.endDate - e.startDate;
-      // timeArray.push({ t, timeTaken });
-      // });
-      // });
+      const ProjectTime: any = [];
+      for (let i = 0; i < timeArray.length; i += 1) {
+        ProjectTime.push({
+          project_id: timeArray[i].t.project_id,
+          timetaken: timeArray[i].timeTaken,
+        });
+      }
 
-      console.log(startOfWeek(new Date()));
-      console.log(endOfWeek(new Date()));
-      res.json({ tasksArray });
+      function removeDuplicates(projectArr: any) {
+        // shallow copy of project Arr
+        let newArr = [...projectArr];
+        // loop through newArr
+        for (let i = 0; i < newArr.length; i += 1) {
+          // let the first element be temp so that we can compare
+          let temp = newArr[i];
+          // console.log("temp", temp.project_id);
+          // start another loop
+          for (let j = i + 1; j < newArr.length; j += 1) {
+            // console.log("new", newArr[j].project_id);
+            // console.log(temp.projectid == newArr[j].project_id);
+            // if first item project id is equal to 2nd item project id
+            if (toString(temp.project_id) === toString(newArr[j].project_id)) {
+              // get the timetaken for the first item
+              let currentToken = temp.timetaken;
+              // get the time taken for the second item
+              let token = newArr[j].timetaken;
+              // remove the second item via splice
+              newArr.splice(j, 1);
+              // get a new total for item 1 time
+              let newToken = currentToken + token;
+              // assign the new total time to the first index
+              temp.timetaken = newToken;
+            }
+          }
+        }
+        // return back new Array
+        return newArr;
+      }
+
+      const filteredList = removeDuplicates(ProjectTime);
+      const projectsList = projects.flat();
+
+      const nameTimeArray: any = [];
+
+      // loop through filtered list
+      for (let i = 0; i < projectsList.length; i += 1) {
+        if (
+          toString(projectsList[i]._id) === toString(filteredList[i].project_id)
+        ) {
+          nameTimeArray.push({
+            name: projectsList[i].name,
+            value: timeConversion(filteredList[i].timetaken),
+          });
+        }
+      }
+
+      res.json({ nameTimeArray });
     } catch (error) {
       console.log("Error message: ", error);
     }
