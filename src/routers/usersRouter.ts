@@ -1,24 +1,28 @@
 import express from "express";
+
 const router = express.Router();
 
 export default class UsersRouter {
   public controller: any;
-  public passport: any;
-  constructor(controller: any, passport: any) {
+  constructor(controller: any) {
     this.controller = controller;
-    this.passport = passport;
   }
 
   routes() {
-    router.get("/auth/google", this.passport.authenticate("google", { scope: ["profile"] }));
-    router.get(
-      "/auth/redirect/google",
-      this.passport.authenticate("google", { failureRedirect: "/login" }),
-      (req, res) => res.redirect("/app")
-    );
+    router.get("/log", this.controller.logUser.bind(this.controller));
+    router.get("/logout", this.controller.logoutUser.bind(this.controller));
+    router.get("/user", this.controller.getUser.bind(this.controller));
 
-    // router.post("/mongo", this.controller.createUser.bind(this.controller));
+    // router.post("/register", this.controller.createUser.bind(this.controller));
+    // router.post(
+    //   "/login",
+    //   passport.authenticate("local"),
+    //   this.controller.loginUser.bind(this.controller)
+    // );
 
+    router.put("/update", this.controller.updateUser.bind(this.controller));
+
+    router.delete("/delete", this.controller.deleteUser.bind(this.controller));
     return router;
   }
 }

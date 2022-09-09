@@ -3,6 +3,7 @@ import BSON from "BSON";
 import { Model, ObjectId } from "mongoose";
 
 import IClients from "../interfaces/client";
+import users from "../models/users";
 
 class ClientController {
   public model: Model<IClients>;
@@ -12,8 +13,13 @@ class ClientController {
 
   async getClients(request: Request, response: Response) {
     try {
-      const data = await this.model.find({});
-      return response.status(200).json(data);
+      const { user_id } = request.query;
+      const data = await this.model.find({ user_id: user_id });
+      if (data) {
+        return response.status(200).json(data);
+      } else {
+        return response.json({ msg: "no client found" });
+      }
     } catch (error) {
       console.log(error);
     }
