@@ -6,6 +6,8 @@ import Client from "../models/client";
 import Task from "../models/task";
 import ClientController from "./clientController";
 import timeConversion from "../scripts/timeConversion";
+import { startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
+import enGB from "date-fns/locale/en-GB";
 
 class TaskController {
   public model: Model<ITasks>;
@@ -59,8 +61,9 @@ class TaskController {
     }
   }
 
-  async getTasksByProject(req: Request, res: Response) {
-    const { user_id } = req.query;
+  async getTaskByTime(req: Request, res: Response) {
+    const { user_id, time_period } = req.query;
+    console.log("loading piechart data for ", time_period);
     try {
       const getUserClients = await Client.find({ user_id: user_id });
       const clientList = getUserClients.map((c) => c._id);
@@ -74,15 +77,49 @@ class TaskController {
 
       // Get tasks by project ID
       let tasks = [];
-      for (let i = 0; i < projects.length; i++) {
-        for (let j = 0; j < projects[i].length; j++) {
-          let task = await this.model.find({ project_id: projects[i][j]._id });
-          if (task.length) {
-            tasks.push(task);
+
+      if (time_period === "week") {
+        for (let i = 0; i < projects.length; i++) {
+          for (let j = 0; j < projects[i].length; j++) {
+            let task = await this.model.find({
+              project_id: projects[i][j]._id,
+              createdAt: {
+                $gt: startOfWeek(new Date(), { weekStartsOn: 1, locale: enGB }),
+                $lt: endOfWeek(new Date(), { weekStartsOn: 1, locale: enGB }),
+              },
+            });
+            if (task.length) {
+              tasks.push(task);
+            }
+          }
+        }
+      } else if (time_period === "month") {
+        for (let i = 0; i < projects.length; i++) {
+          for (let j = 0; j < projects[i].length; j++) {
+            let task = await this.model.find({
+              project_id: projects[i][j]._id,
+              createdAt: {
+                $gt: startOfMonth(new Date()),
+                $lt: endOfMonth(new Date()),
+              },
+            });
+            if (task.length) {
+              tasks.push(task);
+            }
+          }
+        }
+      } else {
+        for (let i = 0; i < projects.length; i++) {
+          for (let j = 0; j < projects[i].length; j++) {
+            let task = await this.model.find({
+              project_id: projects[i][j]._id,
+            });
+            if (task.length) {
+              tasks.push(task);
+            }
           }
         }
       }
-
       const tasksArray = tasks.flat();
       const timeArray: any = [];
 
@@ -134,9 +171,7 @@ class TaskController {
       }
 
       const filteredList = removeDuplicates(ProjectTime);
-      // console.log(filteredList);
       const projectsList = projects.flat();
-      // console.log(projectsList);
 
       const nameTimeArray: any = [];
 
@@ -151,8 +186,6 @@ class TaskController {
           });
         }
       }
-
-      // console.log(nameTimeArray);
 
       res.json({ nameTimeArray });
     } catch (error) {
