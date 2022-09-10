@@ -252,6 +252,8 @@ class TaskController {
       const time_trackingsArr: any = task?.time_trackings;
       const newTimeTrackingId =
         time_trackingsArr[time_trackingsArr.length - 1]._id;
+
+      console.log("added task: ", task);
       return res.json({ newTimeTrackingId, task });
     } catch (error) {
       console.log("Error message: ", error);
