@@ -158,7 +158,7 @@ class TaskController {
             // console.log("new", newArr[j].project_id);
             // console.log(temp.projectid == newArr[j].project_id);
             // if first item project id is equal to 2nd item project id
-            if (toString(temp.project_id) === toString(newArr[j].project_id)) {
+            if (String(temp.project_id) === String(newArr[j].project_id)) {
               // get the timetaken for the first item
               let currentToken = temp.timetaken;
               // get the time taken for the second item
@@ -184,7 +184,7 @@ class TaskController {
       // loop through filtered list
       for (let i = 0; i < projectsList.length; i += 1) {
         if (
-          toString(projectsList[i]._id) === toString(filteredList[i].project_id)
+          String(projectsList[i]._id) === String(filteredList[i].project_id)
         ) {
           nameTimeArray.push({
             name: projectsList[i].name,
@@ -291,6 +291,8 @@ class TaskController {
       const time_trackingsArr: any = task?.time_trackings;
       const newTimeTrackingId =
         time_trackingsArr[time_trackingsArr.length - 1]._id;
+
+      console.log("added task: ", task);
       return res.json({ newTimeTrackingId, task });
     } catch (error) {
       console.log("Error message: ", error);
@@ -345,12 +347,14 @@ class TaskController {
         (t) => t._id == timetracking_id
       );
       // update time tracking endDate:
-      const currentEndDate: any = time_tracking?.endDate;
-      // console.log("time tracking currentEndDate: ", currentEndDate);
+      const currentStartDate: any = time_tracking?.startDate;
+      console.log("time tracking currentEndDate: ", currentStartDate);
 
-      const msSinceEpoch = new Date(currentEndDate).getTime();
-      const updatedEndDate = new Date(msSinceEpoch + 2.5 * 60 * 60 * 1000);
-      // console.log("time tracking updatedEndDate: ", updatedEndDate);
+      const msSinceEpoch = new Date(currentStartDate).getTime();
+      const updatedEndDate = new Date(
+        msSinceEpoch + updatedTimeSpent * 60 * 60 * 1000
+      );
+      console.log("time tracking updatedEndDate: ", updatedEndDate);
 
       const updatedTask = await this.model.updateOne(
         { _id: id },
