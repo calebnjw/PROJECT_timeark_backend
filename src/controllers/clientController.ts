@@ -14,6 +14,7 @@ class ClientController {
   async getClients(request: Request, response: Response) {
     try {
       const { user_id } = request.query;
+      console.log(user_id);
       const data = await this.model.find({ user_id: user_id });
       if (data) {
         return response.status(200).json(data);
@@ -50,10 +51,11 @@ class ClientController {
 
   async updateClient(request: Request, response: Response) {
     const { clientId } = request.params;
+    // console.log(request.body);
     const clientDetails = request.body;
 
     try {
-      const data = await this.model.replaceOne(
+      const data = await this.model.updateOne(
         { _id: new BSON.ObjectId(clientId) },
         clientDetails
       );
