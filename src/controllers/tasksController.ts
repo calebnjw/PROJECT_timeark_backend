@@ -62,10 +62,10 @@ class TaskController {
   }
 
   async getTaskByTime(req: Request, res: Response) {
-    const { user_id, time_period } = req.query;
+    const { time_period } = req.query;
     console.log("loading piechart data for ", time_period);
     try {
-      const getUserClients = await Client.find({ user_id: user_id });
+      const getUserClients = await Client.find({ user_id: req.user?.id });
       const clientList = getUserClients.map((c) => c._id);
 
       // Get projects by Client ID
@@ -79,7 +79,7 @@ class TaskController {
       let tasks = [];
 
       if (time_period === "week") {
-        console.log("--> code goes to week");
+        // console.log("--> code goes to week");
         for (let i = 0; i < projects.length; i++) {
           for (let j = 0; j < projects[i].length; j++) {
             let task = await this.model.find({
@@ -202,8 +202,8 @@ class TaskController {
   async getTasksBySelectedDate(req: Request, res: Response) {
     try {
       const { selectedDate } = req.params;
-      const { user_id } = req.query;
-      const getUserClients = await Client.find({ user_id: user_id });
+      // const { user_id } = req.query;
+      const getUserClients = await Client.find({ user_id: req.user?.id });
       const clientList = getUserClients.map((c) => c._id);
 
       // Get projects by Client ID
