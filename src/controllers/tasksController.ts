@@ -79,6 +79,7 @@ class TaskController {
       let tasks = [];
 
       if (time_period === "week") {
+        console.log("--> code goes to week");
         for (let i = 0; i < projects.length; i++) {
           for (let j = 0; j < projects[i].length; j++) {
             let task = await this.model.find({
@@ -93,7 +94,9 @@ class TaskController {
             }
           }
         }
+        console.log("week", tasks);
       } else if (time_period === "month") {
+        console.log("--> code goes to month");
         for (let i = 0; i < projects.length; i++) {
           for (let j = 0; j < projects[i].length; j++) {
             let task = await this.model.find({
@@ -108,7 +111,9 @@ class TaskController {
             }
           }
         }
+        console.log("week", tasks);
       } else {
+        console.log("--> code goes to all");
         for (let i = 0; i < projects.length; i++) {
           for (let j = 0; j < projects[i].length; j++) {
             let task = await this.model.find({
@@ -119,6 +124,7 @@ class TaskController {
             }
           }
         }
+        console.log("all", tasks);
       }
       const tasksArray = tasks.flat();
       const timeArray: any = [];
