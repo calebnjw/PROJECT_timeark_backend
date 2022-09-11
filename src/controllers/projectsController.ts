@@ -80,6 +80,8 @@ class ProjectController {
         return c.project_ids;
       });
 
+      console.log("projects: ", getProjects);
+
       const projects = getProjects.flat();
       if (projects.length) {
         return res.json({
