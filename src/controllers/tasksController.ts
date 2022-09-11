@@ -152,7 +152,7 @@ class TaskController {
             // console.log("new", newArr[j].project_id);
             // console.log(temp.projectid == newArr[j].project_id);
             // if first item project id is equal to 2nd item project id
-            if (toString(temp.project_id) === toString(newArr[j].project_id)) {
+            if (String(temp.project_id) === String(newArr[j].project_id)) {
               // get the timetaken for the first item
               let currentToken = temp.timetaken;
               // get the time taken for the second item
@@ -178,7 +178,7 @@ class TaskController {
       // loop through filtered list
       for (let i = 0; i < projectsList.length; i += 1) {
         if (
-          toString(projectsList[i]._id) === toString(filteredList[i].project_id)
+          String(projectsList[i]._id) === String(filteredList[i].project_id)
         ) {
           nameTimeArray.push({
             name: projectsList[i].name,
