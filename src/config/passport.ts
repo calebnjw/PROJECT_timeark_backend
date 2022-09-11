@@ -66,7 +66,7 @@ passport.serializeUser((userModel: globalThis.Express.User, done) => {
   console.log("serializing user");
   const { id, displayName, newUser } = userModel;
   console.log("----> serialized userModel:", userModel);
-  done(null, { id, displayName, newUser });
+  done(null, { id: id, name: displayName, user: newUser });
 });
 
 passport.deserializeUser((userModel: globalThis.Express.User, done) => {

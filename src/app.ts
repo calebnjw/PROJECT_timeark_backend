@@ -5,6 +5,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import expressSession from "express-session";
+import sqliteStoreFactory from "express-session-sqlite";
+import * as sqlite3 from "sqlite3";
 import passport from "passport";
 
 dotenv.config();
@@ -65,6 +67,8 @@ app.use(
   })
 );
 
+const SQLiteStore = sqliteStoreFactory(expressSession);
+
 app.use(
   expressSession({
     cookie: {
@@ -75,11 +79,17 @@ app.use(
     saveUninitialized: true,
     secret: GOOGLE_CLIENT_SECRET,
     unset: "destroy",
+    store: new SQLiteStore({
+      driver: sqlite3.Database,
+      path: "var/db.sqlite",
+      ttl: 1000 * 3600,
+    }),
   })
 );
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(passport.authenticate("session"));
 
 // starting passport
 import "./config/passport";

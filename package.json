@@ -22,17 +22,20 @@
   "homepage": "https://github.com/calebnjw/PROJECT_timeark_backend#readme",
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "connect-mongo": "^4.6.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "date-fns": "^2.29.2",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "express-session": "^1.17.3",
+    "express-session-sqlite": "^2.1.1",
     "mongoose": "^6.5.2",
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
-    "passport-local-mongoose": "^7.1.2"
+    "passport-local-mongoose": "^7.1.2",
+    "sqlite3": "^5.0.11"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
