@@ -62,7 +62,7 @@ class ProjectController {
         req.params.id,
         req.body
       );
-      console.log("updated Project: ", project);
+      // console.log("updated Project: ", project);
       return res.json({ msg: "Project updated" });
     } catch (error) {
       console.log("Error message: ", error);
@@ -71,13 +71,16 @@ class ProjectController {
 
   async getUsersAllProjects(req: Request, res: Response) {
     try {
-      const { user_id } = req.query;
-      const clients = await Client.find({ user_id: user_id }).populate(
+      // const { user_id } = req.query;
+      console.log("user id: ", req.user?.id);
+      const clients = await Client.find({ user_id: req.user?.id }).populate(
         "project_ids"
       );
       const getProjects = clients.map((c) => {
         return c.project_ids;
       });
+
+      console.log("projects: ", getProjects);
 
       const projects = getProjects.flat();
       if (projects.length) {

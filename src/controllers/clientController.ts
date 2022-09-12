@@ -13,7 +13,6 @@ class ClientController {
 
   async getClients(request: Request, response: Response) {
     try {
-      // const { user_id } = request.query;
       if (request.user) {
         const { id } = request.user;
         const data = await this.model.find({ user_id: id });
@@ -41,7 +40,7 @@ class ClientController {
   }
 
   async createClient(request: Request, response: Response) {
-    const clientDetails = request.body;
+    const clientDetails = { ...request.body, user_id: request.user?.id };
 
     try {
       const data = await this.model.create(clientDetails);
