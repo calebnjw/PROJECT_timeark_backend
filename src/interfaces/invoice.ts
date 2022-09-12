@@ -6,4 +6,5 @@ export default interface IInvoices extends Document {
   overdue: boolean;
   issuedDate: Date;
   month: string;
+  amount: Number;
 }
