@@ -22,7 +22,7 @@ export default class AuthRouter {
       passport.authenticate("google", {
         // TODO: success should redirect to temporary route that checks whether new user, then that page will redirect to homepage or continue onboarding if new user.
         failureRedirect: `${FRONTEND_URL}/login`,
-        successRedirect: `${FRONTEND_URL}/dashboard`,
+        successRedirect: `${FRONTEND_URL}/app/dashboard`,
       })
     );
 
