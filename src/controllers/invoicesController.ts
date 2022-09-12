@@ -32,13 +32,14 @@ class InvoiceController {
   async createInvoice(req: Request, res: Response) {
     try {
       const { project_id, selectedMonth } = req.body;
+      console.log("reqbody", req.body)
 
       const selectedProject: any = await Project.findById(project_id).populate(
         "invoice_ids"
       );
 
       const issuedInvoices = selectedProject.invoice_ids;
-
+      
       const existingInvoice = issuedInvoices.find(
         (i: any) => i.month === selectedMonth
       );
@@ -53,6 +54,7 @@ class InvoiceController {
           issuedDate: new Date(),
           overdue: false,
           month: selectedMonth,
+          
         };
         const newInvoiceDetails = await this.model.create(newInvoice);
         selectedProject?.invoice_ids.push(newInvoiceDetails._id);
@@ -73,6 +75,18 @@ class InvoiceController {
       console.log("Error message: ", err);
     }
   }
+
+  async deleteSingleInvoice(req: Request, res: Response) {
+    try {
+      const invoice = await this.model.findByIdAndDelete(req.params.invoiceId);
+      console.log("paramsid",req.params.invoiceId)
+      return res.json({ invoice })
+    } catch(err){
+      console.log(err)
+    }
+  }
+
+
 
   async getBarChartData(req: Request, res: Response) {
     const { user_id } = req.query; // Please use req.user.id here!
