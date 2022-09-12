@@ -22,6 +22,9 @@ const InvoiceSchema: Schema = new Schema(
     month: {
       type: String,
       required: true,
+    },
+    amount: {
+      type: Number,
     }
   },
   {

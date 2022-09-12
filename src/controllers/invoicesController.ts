@@ -47,7 +47,8 @@ class InvoiceController {
           paid: false,
           issuedDate: new Date(),
           overdue: false,
-          month: selectedMonth
+          month: selectedMonth,
+          amount: "totalamount",
         }
         const newInvoiceDetails = await this.model.create(newInvoice);
         selectedProject?.invoice_ids.push(newInvoiceDetails._id);
