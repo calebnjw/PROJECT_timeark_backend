@@ -40,7 +40,7 @@ class ClientController {
   }
 
   async createClient(request: Request, response: Response) {
-    const clientDetails = request.body;
+    const clientDetails = { ...request.body, user_id: request.user?.id };
 
     try {
       const data = await this.model.create(clientDetails);
