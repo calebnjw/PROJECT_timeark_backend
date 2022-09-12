@@ -13,7 +13,7 @@ const isAuthenticated = () => (request: Request, response: Response, next: NextF
   // if user is not logged in, redirect.
   console.log("NO REQUEST.USER, REDIRECTING TO LOGIN");
   response.cookie("loggedIn", false);
-  return response.status(401);
+  return response.status(401).redirect(`${FRONTEND_URL}/login?loggedIn=false`);
 };
 
 export default isAuthenticated;
