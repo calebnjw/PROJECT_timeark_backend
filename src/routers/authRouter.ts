@@ -12,6 +12,7 @@ export default class AuthRouter {
       "/google",
       passport.authenticate("google", {
         scope: ["email", "profile"],
+        prompt: "consent",
       })
     );
 
@@ -20,8 +21,8 @@ export default class AuthRouter {
       "/google/callback",
       passport.authenticate("google", {
         // TODO: success should redirect to temporary route that checks whether new user, then that page will redirect to homepage or continue onboarding if new user.
-        successRedirect: `${FRONTEND_URL}/dashboard`,
         failureRedirect: `${FRONTEND_URL}/login`,
+        successRedirect: `${FRONTEND_URL}/dashboard`,
       })
     );
 
