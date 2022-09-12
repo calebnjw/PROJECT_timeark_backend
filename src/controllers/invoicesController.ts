@@ -75,9 +75,8 @@ class InvoiceController {
   }
 
   async getBarChartData(req: Request, res: Response) {
-    const { user_id } = req.query; // Please use req.user.id here!
     try {
-      const getUserClients = await Client.find({ user_id: user_id });
+      const getUserClients = await Client.find({ user_id: req.user?.id });
       const clientList = getUserClients.map((c) => c._id);
 
       // Get projects by Client ID
@@ -106,11 +105,10 @@ class InvoiceController {
           }
         }
 
-        // i don't know how to resolve this
         barchartData.push([
           projectflat[i].name,
-          // projectAmtEarned,
-          // projectflat[i].budget,
+          String(projectAmtEarned),
+          String(projectflat[i].budget),
         ]);
       }
       res.json(barchartData);
