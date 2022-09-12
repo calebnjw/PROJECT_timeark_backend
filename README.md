@@ -8,7 +8,9 @@ Time tracking and user invoicing app for freelancers.
 # Mongo DB connection
 
 To configure MongoDB, in .env file, set MONGO_URI and MONGO_NAME
+
 MONGO_URI refers to the connection string to access MongoDB server
+
 MONGO_NAME is the name of the Mongo database within the server
 
 Example:
