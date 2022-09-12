@@ -15,6 +15,7 @@ class ClientController {
     try {
       if (request.user) {
         const { id } = request.user;
+        console.log("user id: ", id);
         const data = await this.model.find({ user_id: id });
         if (data) {
           return response.status(200).json(data);
@@ -41,7 +42,7 @@ class ClientController {
 
   async createClient(request: Request, response: Response) {
     const clientDetails = { ...request.body, user_id: request.user?.id };
-
+    console.log("client details: ", clientDetails);
     try {
       const data = await this.model.create(clientDetails);
       return response.status(200).json(data);
