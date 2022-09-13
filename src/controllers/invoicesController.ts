@@ -75,9 +75,9 @@ class InvoiceController {
   }
 
   async getBarChartData(req: Request, res: Response) {
-    const { id } = req.user; // Please use req.user.id here!
+    const userId = req.user?.id;
     try {
-      const getUserClients = await Client.find({ user_id: id });
+      const getUserClients = await Client.find({ user_id: userId });
       const clientList = getUserClients.map((c) => c._id);
 
       // Get projects by Client ID
