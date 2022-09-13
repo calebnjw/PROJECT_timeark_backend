@@ -32,6 +32,7 @@ class InvoiceController {
   async createInvoice(req: Request, res: Response) {
     try {
       const { project_id, selectedMonth } = req.body;
+      console.log("reqbody", req.body);
 
       const selectedProject: any = await Project.findById(project_id).populate(
         "invoice_ids"
@@ -74,10 +75,19 @@ class InvoiceController {
     }
   }
 
-  async getBarChartData(req: Request, res: Response) {
-    const userId = req.user?.id;
+  async deleteSingleInvoice(req: Request, res: Response) {
     try {
-      const getUserClients = await Client.find({ user_id: userId });
+      const invoice = await this.model.findByIdAndDelete(req.params.invoiceId);
+      console.log("paramsid", req.params.invoiceId);
+      return res.json({ invoice });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async getBarChartData(req: Request, res: Response) {
+    try {
+      const getUserClients = await Client.find({ user_id: req.user?.id });
       const clientList = getUserClients.map((c) => c._id);
 
       // Get projects by Client ID
@@ -106,11 +116,10 @@ class InvoiceController {
           }
         }
 
-        // i don't know how to resolve this
         barchartData.push([
           projectflat[i].name,
-          // projectAmtEarned,
-          // projectflat[i].budget,
+          String(projectAmtEarned),
+          String(projectflat[i].budget),
         ]);
       }
       res.json(barchartData);

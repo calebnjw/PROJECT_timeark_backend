@@ -28,9 +28,9 @@ class UserController {
 
       try {
         const user = await this.model.findOne({ _id: id });
-        response.status(200).json({ success: true, user, newUser });
+        return response.status(200).json({ success: true, user, newUser });
       } catch (error) {
-        response.status(404).json({ success: false });
+        return response.status(404).json({ success: false });
       }
     } else {
       return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
@@ -56,10 +56,10 @@ class UserController {
         if (request.user.newUser) {
           request.user.newUser = false;
         }
-        response.status(200).json({ success: updated.acknowledged });
+        return response.status(200).json({ success: updated.acknowledged });
       } catch (error) {
         console.error();
-        response.status(500).json({ success: false, message: error });
+        return response.status(500).json({ success: false, message: error });
       }
     } else {
       return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
@@ -81,11 +81,11 @@ class UserController {
         // and destroy current session
         request.session.destroy((error) => {
           if (error) console.error("SESSION ERROR");
-          response.status(200).redirect(`${FRONTEND_URL}/login`);
         });
+        return response.status(200).redirect(`${FRONTEND_URL}/login`);
       } catch (error: any) {
         console.error();
-        response.status(500).json({ success: false, message: error });
+        return response.status(500).json({ success: false, message: error });
       }
     } else {
       return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
@@ -114,7 +114,7 @@ class UserController {
         return response.status(200).json({ success: deleted.acknowledged });
       } catch (error: any) {
         console.error();
-        response.status(500).json({ success: false, message: error });
+        return response.status(500).json({ success: false, message: error });
       }
     } else {
       return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
