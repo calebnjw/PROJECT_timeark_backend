@@ -148,39 +148,42 @@ class TaskController {
           timetaken: timeArray[i].timeTaken,
         });
       }
-
       function removeDuplicates(projectArr: any) {
         // shallow copy of project Arr
         let newArr = [...projectArr];
         // loop through newArr
         for (let i = 0; i < newArr.length; i += 1) {
-          // let the first element be temp so that we can compare
           let temp = newArr[i];
-          // console.log("temp", temp.project_id);
+          // let the first element be temp so that we can compare
           // start another loop
-          for (let j = i + 1; j < newArr.length; j += 1) {
-            // console.log("new", newArr[j].project_id);
-            // console.log(temp.projectid == newArr[j].project_id);
+          for (let j = 1; j < newArr.length; j += 1) {
+            console.log("temp", temp.project_id);
+            console.log("new", newArr[j].project_id);
+            console.log(
+              temp.project_id.toString() === newArr[j].project_id.toString()
+            );
             // if first item project id is equal to 2nd item project id
-            if (String(temp.project_id) === String(newArr[j].project_id)) {
+            if (
+              temp.project_id.toString() === newArr[j].project_id.toString()
+            ) {
               // get the timetaken for the first item
               let currentToken = temp.timetaken;
               // get the time taken for the second item
               let token = newArr[j].timetaken;
               // remove the second item via splice
-              newArr.splice(j, 1);
+              newArr.splice(i, 1);
               // get a new total for item 1 time
               let newToken = currentToken + token;
               // assign the new total time to the first index
-              temp.timetaken = newToken;
+              newArr[j].timetaken = newToken;
             }
           }
         }
         // return back new Array
         return newArr;
       }
-
       const filteredList = removeDuplicates(ProjectTime);
+
       const projectsList = projects.flat();
 
       const nameTimeArray: any = [];
