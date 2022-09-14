@@ -18,7 +18,6 @@ class TaskController {
   async getAllTasks(req: Request, res: Response) {
     try {
       const { project_id } = req.query;
-      // console.log("project id: ", project_id);
       const project: any = await Project.findById(project_id).populate(
         "task_ids"
       );
@@ -63,12 +62,9 @@ class TaskController {
 
   async getTaskByTime(req: Request, res: Response) {
     const { time_period } = req.query;
-    // console.log("loading piechart data for ", time_period);
     try {
-      console.log("get task by time - user id: ", req.user?.id);
       const getUserClients = await Client.find({ user_id: req.user?.id });
       const clientList = getUserClients.map((c) => c._id);
-      console.log("client list: ", clientList);
 
       // Get projects by Client ID
       let projects = [];
@@ -77,13 +73,9 @@ class TaskController {
         projects.push(project);
       }
 
-      console.log("projects number: ", projects.length);
-
       // Get tasks by project ID
       let tasks = [];
-
       if (time_period === "week") {
-        // console.log("--> code goes to week");
         for (let i = 0; i < projects.length; i++) {
           for (let j = 0; j < projects[i].length; j++) {
             let task = await this.model.find({
@@ -98,9 +90,7 @@ class TaskController {
             }
           }
         }
-        // console.log("week", tasks);
       } else if (time_period === "month") {
-        // console.log("--> code goes to month");
         for (let i = 0; i < projects.length; i++) {
           for (let j = 0; j < projects[i].length; j++) {
             let task = await this.model.find({
@@ -115,9 +105,7 @@ class TaskController {
             }
           }
         }
-        // console.log("week", tasks);
       } else {
-        // console.log("--> code goes to all");
         for (let i = 0; i < projects.length; i++) {
           for (let j = 0; j < projects[i].length; j++) {
             let task = await this.model.find({
@@ -128,11 +116,9 @@ class TaskController {
             }
           }
         }
-        // console.log("all", tasks);
       }
       const tasksArray = tasks.flat();
       const timeArray: any = [];
-
       tasksArray.map((t) => {
         let timeTaken: number = 0;
         t.time_trackings.map((e: any, idx) => {
@@ -157,11 +143,6 @@ class TaskController {
           // let the first element be temp so that we can compare
           // start another loop
           for (let j = 1; j < newArr.length; j += 1) {
-            console.log("temp", temp.project_id);
-            console.log("new", newArr[j].project_id);
-            console.log(
-              temp.project_id.toString() === newArr[j].project_id.toString()
-            );
             // if first item project id is equal to 2nd item project id
             if (
               temp.project_id.toString() === newArr[j].project_id.toString()
@@ -189,9 +170,6 @@ class TaskController {
       const nameTimeArray: any = [];
 
       // loop through filtered list
-      console.log("project list: ", projectsList.length);
-      console.log("filteredList: ", filteredList.length);
-
       // for (let i = 0; i < projectsList.length; i += 1) {
       //   if (String(projectsList[i]._id) == String(filteredList[i].project_id)) {
       //     nameTimeArray.push({
@@ -212,8 +190,6 @@ class TaskController {
         });
       });
 
-      console.log("TimeArrayList: ", nameTimeArray);
-
       res.json({ nameTimeArray });
     } catch (error) {
       console.log("Error message: ", error);
@@ -223,8 +199,6 @@ class TaskController {
   async getTasksBySelectedDate(req: Request, res: Response) {
     try {
       const { selectedDate } = req.params;
-      // const { user_id } = req.query;
-      console.log("user id: ", req.user?.id);
       const getUserClients = await Client.find({ user_id: req.user?.id });
       const clientList = getUserClients.map((c) => c._id);
 
@@ -283,13 +257,10 @@ class TaskController {
   async getSingleTimeTracking(req: Request, res: Response) {
     try {
       const { id, timetracking_id } = req.params;
-      // console.log("task id: ", id, "time tracking id: ", timetracking_id);
       const task = await this.model.findById(id);
       const time_tracking = task?.time_trackings.find(
         (t) => t._id == timetracking_id
       );
-
-      // console.log(task, time_tracking);
 
       return res.json({
         msg: "show single time tracking",
@@ -304,7 +275,9 @@ class TaskController {
   async addTimeTracking(req: Request, res: Response) {
     try {
       const { id } = req.params;
+
       const task = await this.model.findById(id);
+      console.log("current task: ", task);
       const newTimeTracking: any = {
         startDate: new Date(),
       };
@@ -314,7 +287,15 @@ class TaskController {
       const newTimeTrackingId =
         time_trackingsArr[time_trackingsArr.length - 1]._id;
 
-      // console.log("added task: ", task);
+      console.log("updated task: ", task);
+      const newTimeEntryWithTaskInfo: any = task?.time_trackings.find(
+        (tt) => tt._id == newTimeTrackingId
+      );
+      const taskWithSingleTimeEntry = { ...task };
+      taskWithSingleTimeEntry.time_trackings = [newTimeEntryWithTaskInfo];
+
+      console.log("task with single time info: ", taskWithSingleTimeEntry);
+
       return res.json({ newTimeTrackingId, task });
     } catch (error) {
       console.log("Error message: ", error);
@@ -330,7 +311,6 @@ class TaskController {
       );
 
       if (!time_tracking?.endDate) {
-        // console.debug("no date found");
         const updatedTask = await Task.updateOne(
           { _id: id },
           { $set: { "time_trackings.$[element].endDate": new Date() } },
@@ -341,7 +321,6 @@ class TaskController {
 
         return res.json({ msg: "end date added", getUpdatedTask });
       } else {
-        // console.info("date found");
         return res.json({ msg: "end date already exists" });
       }
     } catch (error) {
@@ -354,29 +333,16 @@ class TaskController {
     try {
       const { id, timetracking_id } = req.params;
       const { updatedTimeSpent } = req.body;
-      // console.log(
-      //   "task id: ",
-      //   id,
-      //   "time tracking id: ",
-      //   timetracking_id,
-      //   "updated time spent: ",
-      //   updatedTimeSpent
-      // );
       const task = await this.model.findById(id);
-      // console.log("current task: ", task);
-
       const time_tracking = task?.time_trackings.find(
         (t) => t._id == timetracking_id
       );
       // update time tracking endDate:
       const currentStartDate: any = time_tracking?.startDate;
-      // console.log("time tracking currentEndDate: ", currentStartDate);
-
       const msSinceEpoch = new Date(currentStartDate).getTime();
       const updatedEndDate = new Date(
         msSinceEpoch + updatedTimeSpent * 60 * 60 * 1000
       );
-      // console.log("time tracking updatedEndDate: ", updatedEndDate);
 
       const updatedTask = await this.model.updateOne(
         { _id: id },
@@ -386,9 +352,6 @@ class TaskController {
 
       await task?.save();
       const getUpdatedTask = await this.model.findById(id);
-
-      // console.log("updated task: ", getUpdatedTask);
-
       return res.json({ msg: "request received", getUpdatedTask });
     } catch (error) {
       console.log("Error message: ", error);
@@ -399,10 +362,6 @@ class TaskController {
   async deleteTimeTracking(req: Request, res: Response) {
     try {
       const { id, timetracking_id } = req.params;
-      // console.log("task id: ", id, "time tracking id: ", timetracking_id);
-      // const task = await this.model.findById(id);
-      // console.log("current task: ", task);
-
       const result = await this.model.updateOne(
         { _id: id },
         {
@@ -413,8 +372,6 @@ class TaskController {
       );
 
       const getUpdatedTask = await this.model.findById(id);
-      // console.log("updated task: ", getUpdatedTask);
-
       return res.json({ msg: "time tracking record removed!" });
     } catch (error) {
       console.log("Error message: ", error);
