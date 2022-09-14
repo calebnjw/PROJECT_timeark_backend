@@ -1,5 +1,14 @@
 import mongoose, { Schema } from "mongoose";
-import IInvoices from "../interfaces/invoice";
+import IInvoices, { TaskTime } from "../interfaces/invoice";
+
+const TimeSchema: Schema<TaskTime> = new Schema({
+  taskName: {
+    type: String,
+  },
+  timeSpent: {
+    type: Number,
+  },
+});
 
 const InvoiceSchema: Schema = new Schema(
   {
@@ -23,6 +32,11 @@ const InvoiceSchema: Schema = new Schema(
       type: String,
       required: true,
     },
+    time_trackings: [
+      {
+        type: TimeSchema,
+      },
+    ],
     amount: {
       type: Number,
     }

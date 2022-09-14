@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
-import { Model } from "mongoose";
+import { AnyExpression, Model } from "mongoose";
 import IInvoices from "../interfaces/invoice";
 import Project from "../models/project";
 import Client from "../models/client";
 import Invoice from "../models/invoice";
-import project from "../models/project";
+import timeConversion from "../scripts/timeConversion";
+import { startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
+import enGB from "date-fns/locale/en-GB";
 import Task from "../models/task";
-import task from "../models/task";
-import client from "../models/client";
+import ITasks from "../interfaces/task";
 
 class InvoiceController {
   public model: Model<IInvoices>;
@@ -37,6 +38,76 @@ class InvoiceController {
       const selectedProject: any = await Project.findById(project_id).populate(
         "invoice_ids"
       );
+      console.log("selected project: ", selectedProject);
+      // Find the project with project id
+      // Loop through the tasks arr by tasks id
+      const taskIds = selectedProject.task_ids;
+      console.log("task ids: ", taskIds);
+      const tasksArr: any = [];
+      for (let i = 0; i < taskIds.length; i += 1) {
+        const task: any = await Task.findById(taskIds[i]);
+        console.log("task: ", task);
+        tasksArr.push(task);
+      }
+      console.log("tasks arr: ", tasksArr);
+      const getFirstDayOfMonth = (year: any, month: any) => {
+        return new Date(year, month, 1);
+      };
+      const monthObj: any = {
+        January: "01",
+        Febuary: "02",
+        March: "03",
+        April: "04",
+        May: "05",
+        June: "06",
+        July: "07",
+        August: "08",
+        September: "09",
+        October: "10",
+        November: "11",
+        December: "12",
+      };
+      const year = new Date().getFullYear();
+
+      const firstDayOfSelectedMonth = new Date(
+        year,
+        monthObj[selectedMonth] - 1,
+        1
+      );
+      const lastDayOfSelectedMonth = new Date(year, monthObj[selectedMonth], 0);
+      const timeTaskArr = tasksArr.map((t: any) => {
+        const filteredTime = t.time_trackings.filter(
+          (tt: any) =>
+            new Date(tt.startDate) > new Date(firstDayOfSelectedMonth) &&
+            new Date(tt.endDate) < new Date(lastDayOfSelectedMonth)
+        );
+        t.time_trackings = filteredTime;
+        return t;
+      });
+
+      console.log("time trackings", timeTaskArr);
+      const sortedTimeTaskArr = timeTaskArr.flat();
+
+      const timeArr: any = sortedTimeTaskArr.map((timeTask: any) => {
+        console.log(timeTask.time_trackings);
+        const timeArr = timeTask.time_trackings.map((tt: any) => {
+          const st = new Date(tt.startDate).getTime();
+          const dt = new Date(tt.endDate).getTime();
+          const timeDiff = dt - st;
+          const getHours = timeDiff / (1000 * 60 * 60);
+          return getHours;
+        });
+        const sumOfTime = timeArr.reduce((a: any, b: any) => a + b);
+        return { taskName: timeTask.name, timeSpent: sumOfTime };
+      });
+
+      console.log(" time arr: ", timeArr);
+      const totalTimeSpent = timeArr.reduce(
+        (a: any, b: any) => a.timeSpent + b.timeSpent
+      );
+      console.log("totalTimeSpent", totalTimeSpent);
+      const totalAmount = selectedProject.rate * totalTimeSpent;
+      console.log("totalAmount: ", totalAmount);
 
       const issuedInvoices = selectedProject.invoice_ids;
 
@@ -54,11 +125,14 @@ class InvoiceController {
           issuedDate: new Date(),
           overdue: false,
           month: selectedMonth,
+          amount: totalAmount,
+          time_trackings: timeArr,
         };
         const newInvoiceDetails = await this.model.create(newInvoice);
         selectedProject?.invoice_ids.push(newInvoiceDetails._id);
         await selectedProject?.save();
-        return res.json({ msg: "Added new invoice" });
+
+        return res.json({ msg: "Added new invoice", newInvoiceDetails });
       }
     } catch (err) {
       console.log("Error message: ", err);
