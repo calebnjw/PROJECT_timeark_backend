@@ -8,6 +8,7 @@ import ClientController from "./clientController";
 import timeConversion from "../scripts/timeConversion";
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
 import enGB from "date-fns/locale/en-GB";
+import project from "../models/project";
 
 class TaskController {
   public model: Model<ITasks>;
@@ -211,14 +212,24 @@ class TaskController {
 
       // Get tasks by project ID
       let tasks = [];
+      // let tasksCopy = [];
       for (let i = 0; i < projects.length; i++) {
         for (let j = 0; j < projects[i].length; j++) {
-          let task = await this.model.find({ project_id: projects[i][j]._id });
+          // let task = await this.model.find({ project_id: projects[i][j]._id });
+          let task = await this.model
+            .find({
+              project_id: projects[i][j]._id,
+            })
+            .populate("project_id");
+
           if (task.length) {
             tasks.push(task);
+            // tasksCopy.push(taskCopy);
           }
         }
       }
+      // console.log("tasksCopy: ", tasksCopy);
+      // console.log("tasks: ", tasks);
 
       // Convert date to string
       function formatDate(date: Date) {
@@ -245,6 +256,7 @@ class TaskController {
       });
 
       if (tasksBySelectedDate.length) {
+        console.log("tasksBySelectedDate: ", tasksBySelectedDate);
         return res.json({ tasksBySelectedDate });
       } else {
         return res.json({ msg: `No task found on selected date` });
