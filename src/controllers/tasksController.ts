@@ -34,9 +34,12 @@ class TaskController {
       const { project_id } = req.body;
       const project: any = await Project.findById(project_id);
       // Need to Check if client.user_id === current user!!!
-      const newTask = await this.model.create({ ...req.body });
-      project.task_ids.push(newTask.id);
+      const createTask = await this.model.create({ ...req.body });
+      project.task_ids.push(createTask.id);
       await project.save();
+      const newTask = await this.model
+        .findById(createTask.id)
+        .populate("project_id");
       return res.json({ msg: "Added new task", newTask });
     } catch (error) {
       console.log("Error message: ", error);
@@ -228,8 +231,6 @@ class TaskController {
           }
         }
       }
-      // console.log("tasksCopy: ", tasksCopy);
-      // console.log("tasks: ", tasks);
 
       // Convert date to string
       function formatDate(date: Date) {
@@ -288,8 +289,7 @@ class TaskController {
     try {
       const { id } = req.params;
 
-      const task = await this.model.findById(id);
-      console.log("current task: ", task);
+      const task = await this.model.findById(id).populate("project_id");
       const newTimeTracking: any = {
         startDate: new Date(),
       };
@@ -299,14 +299,11 @@ class TaskController {
       const newTimeTrackingId =
         time_trackingsArr[time_trackingsArr.length - 1]._id;
 
-      console.log("updated task: ", task);
       const newTimeEntryWithTaskInfo: any = task?.time_trackings.find(
         (tt) => tt._id == newTimeTrackingId
       );
       const taskWithSingleTimeEntry = { ...task };
       taskWithSingleTimeEntry.time_trackings = [newTimeEntryWithTaskInfo];
-
-      console.log("task with single time info: ", taskWithSingleTimeEntry);
 
       return res.json({ newTimeTrackingId, task });
     } catch (error) {
@@ -329,7 +326,9 @@ class TaskController {
           { arrayFilters: [{ "element._id": timetracking_id }] }
         );
         await task?.save();
-        const getUpdatedTask = await this.model.findById(id);
+        const getUpdatedTask = await this.model
+          .findById(id)
+          .populate("project_id");
 
         return res.json({ msg: "end date added", getUpdatedTask });
       } else {
