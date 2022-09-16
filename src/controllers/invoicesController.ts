@@ -53,58 +53,64 @@ class InvoiceController {
       const getFirstDayOfMonth = (year: any, month: any) => {
         return new Date(year, month, 1);
       };
-      const monthObj:any = {
-        "January": "01",
-        "Febuary": "02",
-        "March": "03",
-        "April": "04",
-        "May": "05",
-        "June": "06",
-        "July": "07",
-        "August": "08",
-        "September": "09",
-        "October": "10",
-        "November": "11",
-        "December": "12",
+      const monthObj: any = {
+        January: "01",
+        Febuary: "02",
+        March: "03",
+        April: "04",
+        May: "05",
+        June: "06",
+        July: "07",
+        August: "08",
+        September: "09",
+        October: "10",
+        November: "11",
+        December: "12",
       };
       const year = new Date().getFullYear();
-      
-      const firstDayOfSelectedMonth = new Date(year, monthObj[selectedMonth]-1, 1);
+
+      const firstDayOfSelectedMonth = new Date(
+        year,
+        monthObj[selectedMonth] - 1,
+        1
+      );
       const lastDayOfSelectedMonth = new Date(year, monthObj[selectedMonth], 0);
       const timeTaskArr = tasksArr.map((t: any) => {
         const filteredTime = t.time_trackings.filter(
-          (tt: any) => 
-          (new Date(tt.startDate) > new Date(firstDayOfSelectedMonth)) && (new Date(tt.endDate) < new Date(lastDayOfSelectedMonth) )
-        )
+          (tt: any) =>
+            new Date(tt.startDate) > new Date(firstDayOfSelectedMonth) &&
+            new Date(tt.endDate) < new Date(lastDayOfSelectedMonth)
+        );
         t.time_trackings = filteredTime;
         return t;
-        
       });
 
-      console.log("time trackings", timeTaskArr)
+      console.log("time trackings", timeTaskArr);
       const sortedTimeTaskArr = timeTaskArr.flat();
 
-      const timeArr: any = sortedTimeTaskArr.map((timeTask:any) => {
-        console.log(timeTask.time_trackings)
-        const timeArr = timeTask.time_trackings.map((tt:any) => {
+      const timeArr: any = sortedTimeTaskArr.map((timeTask: any) => {
+        console.log(timeTask.time_trackings);
+        const timeArr = timeTask.time_trackings.map((tt: any) => {
           const st = new Date(tt.startDate).getTime();
           const dt = new Date(tt.endDate).getTime();
           const timeDiff = dt - st;
-          const getHours = timeDiff /(1000 * 60 * 60)
+          const getHours = timeDiff / (1000 * 60 * 60);
           return getHours;
         });
-        const sumOfTime = timeArr.reduce((a:any, b:any) => a+b);
-          return {"taskName": timeTask.name, "timeSpent":sumOfTime}
-      })
+        const sumOfTime = timeArr.reduce((a: any, b: any) => a + b);
+        return { taskName: timeTask.name, timeSpent: sumOfTime };
+      });
 
-      console.log(" time arr: ", timeArr)
-      const totalTimeSpent = timeArr.reduce((a:any, b:any) => a.timeSpent + b.timeSpent);
-      console.log("totalTimeSpent", totalTimeSpent)
+      console.log(" time arr: ", timeArr);
+      const totalTimeSpent = timeArr.reduce(
+        (a: any, b: any) => a.timeSpent + b.timeSpent
+      );
+      console.log("totalTimeSpent", totalTimeSpent);
       const totalAmount = selectedProject.rate * totalTimeSpent;
-      console.log("totalAmount: ",totalAmount)
-      
+      console.log("totalAmount: ", totalAmount);
+
       const issuedInvoices = selectedProject.invoice_ids;
-      
+
       const existingInvoice = issuedInvoices.find(
         (i: any) => i.month === selectedMonth
       );
@@ -124,9 +130,9 @@ class InvoiceController {
         };
         const newInvoiceDetails = await this.model.create(newInvoice);
         selectedProject?.invoice_ids.push(newInvoiceDetails._id);
-        await selectedProject?.save(); 
-        
-      return res.json({ msg: "Added new invoice", newInvoiceDetails });
+        await selectedProject?.save();
+
+        return res.json({ msg: "Added new invoice", newInvoiceDetails });
       }
     } catch (err) {
       console.log("Error message: ", err);
