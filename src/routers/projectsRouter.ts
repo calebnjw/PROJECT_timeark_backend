@@ -13,8 +13,8 @@ export default class ProjectsRouter {
       .get("/all", this.controller.getUsersAllProjects.bind(this.controller))
       .post("/new", this.controller.createProject.bind(this.controller))
       .get("/:id", this.controller.getSingleProject.bind(this.controller))
-      .put("/:id/update", this.controller.updateProject.bind(this.controller));
-    // .delete("/:id", this.controller.deleteProject.bind(this.controller));
+      .put("/:id/update", this.controller.updateProject.bind(this.controller))
+      .delete("/:id", this.controller.deleteProject.bind(this.controller));
 
     return router;
   }

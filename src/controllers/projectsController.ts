@@ -33,7 +33,6 @@ class ProjectController {
     try {
       const { client_id } = req.body;
       const client: any = await Client.findById(client_id);
-      // Need to Check if client.user_id === current user!!!
       const newProject = await this.model.create({ ...req.body });
       client.project_ids.push(newProject.id);
       await client.save();
@@ -49,12 +48,10 @@ class ProjectController {
         .findById(req.params.id)
         .populate("task_ids");
       // Calculate time and earings
-      // console.log("project: ", project);
       const tasks = project?.task_ids;
       const filteredTasks = tasks?.filter(
         (t: any) => t.time_trackings.length > 0
       );
-      console.log("filteredTasks: ", filteredTasks);
 
       const taskTimeEarnings = filteredTasks?.map((t: any) => {
         let timeArr;
@@ -66,12 +63,10 @@ class ProjectController {
             return getHours;
           });
         }
-        console.log("timeArr: ", timeArr);
         const sumOfTime = timeArr.reduce((a: any, b: any) => a + b);
         const earings = sumOfTime * Number(project?.rate);
         return { value: earings, name: t.name };
       });
-      console.log("taskTimeEarnings: ", taskTimeEarnings);
 
       if (project) {
         return res.json({ project, taskTimeEarnings });
@@ -89,7 +84,6 @@ class ProjectController {
         req.params.id,
         req.body
       );
-      // console.log("updated Project: ", project);
       return res.json({ msg: "Project updated" });
     } catch (error) {
       console.log("Error message: ", error);
@@ -98,16 +92,12 @@ class ProjectController {
 
   async getUsersAllProjects(req: Request, res: Response) {
     try {
-      // const { user_id } = req.query;
-      console.log("user id: ", req.user?.id);
       const clients = await Client.find({ user_id: req.user?.id }).populate(
         "project_ids"
       );
       const getProjects = clients.map((c) => {
         return c.project_ids;
       });
-
-      console.log("projects: ", getProjects);
 
       const projects = getProjects.flat();
       if (projects.length) {
@@ -123,15 +113,20 @@ class ProjectController {
     }
   }
 
-  // TBD: need to discuss if we need delete project function
-  // async deleteProject(req: Request, res: Response) {
-  //   try {
-  //     const project = await this.model.findByIdAndDelete(req.params.id);
-  //     return res.json({ project });
-  //   } catch (error) {
-  //     console.log("Error message: ", error);
-  //   }
-  // }
+  async deleteProject(req: Request, res: Response) {
+    try {
+      const projectId = req.params.id;
+      const project: any = await this.model.findByIdAndDelete(projectId);
+      const client = await Client.updateOne(
+        { _id: project.client_id },
+        { $pull: { project_ids: projectId } }
+      );
+
+      return res.json({ project });
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
+  }
 }
 
 export default ProjectController;
