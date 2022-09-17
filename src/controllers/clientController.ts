@@ -71,9 +71,15 @@ class ClientController {
     const { clientId } = request.params;
     try {
       // delete client from client table
-      await this.model.findByIdAndDelete(clientId);
+      const client: any = await this.model.findByIdAndDelete(clientId);
       // delete projects from with client id
       await Project.deleteMany({ client_id: clientId });
+      //Remove client id from user's client_ids array
+      // const user = await users.updateOne(
+      //   { _id: client.user_id },
+      //   { $pull: { client_ids: clientId } }
+      // );
+
       return response.json("deleted client successfully");
     } catch (error) {
       console.log("Error message: ", error);

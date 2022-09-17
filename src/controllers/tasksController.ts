@@ -33,7 +33,6 @@ class TaskController {
     try {
       const { project_id } = req.body;
       const project: any = await Project.findById(project_id);
-      // Need to Check if client.user_id === current user!!!
       const createTask = await this.model.create({ ...req.body });
       project.task_ids.push(createTask.id);
       await project.save();
@@ -192,10 +191,8 @@ class TaskController {
 
       // Get tasks by project ID
       let tasks = [];
-      // let tasksCopy = [];
       for (let i = 0; i < projects.length; i++) {
         for (let j = 0; j < projects[i].length; j++) {
-          // let task = await this.model.find({ project_id: projects[i][j]._id });
           let task = await this.model
             .find({
               project_id: projects[i][j]._id,
@@ -204,7 +201,6 @@ class TaskController {
 
           if (task.length) {
             tasks.push(task);
-            // tasksCopy.push(taskCopy);
           }
         }
       }
@@ -234,7 +230,6 @@ class TaskController {
       });
 
       if (tasksBySelectedDate.length) {
-        console.log("tasksBySelectedDate: ", tasksBySelectedDate);
         return res.json({ tasksBySelectedDate });
       } else {
         return res.json({ msg: `No task found on selected date` });
@@ -369,7 +364,13 @@ class TaskController {
 
   async deleteTask(req: Request, res: Response) {
     try {
-      const task = await this.model.findByIdAndDelete(req.params.id);
+      const taskId = req.params.id;
+      const task: any = await this.model.findByIdAndDelete(taskId);
+      const project = await Project.updateOne(
+        { _id: task.project_id },
+        { $pull: { task_ids: taskId } }
+      );
+
       return res.json({ task });
     } catch (error) {
       console.log("Error message: ", error);
