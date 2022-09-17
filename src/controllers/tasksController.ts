@@ -121,6 +121,7 @@ class TaskController {
           }
         }
       }
+
       const tasksArray = tasks.flat();
       const timeArray: any = [];
       tasksArray.map((t) => {
@@ -138,53 +139,29 @@ class TaskController {
           timetaken: timeArray[i].timeTaken,
         });
       }
+
       function removeDuplicates(projectArr: any) {
-        // shallow copy of project Arr
         let newArr = [...projectArr];
-        // loop through newArr
+        const result: any = [];
+        const map: any = {};
         for (let i = 0; i < newArr.length; i += 1) {
-          let temp = newArr[i];
-          // let the first element be temp so that we can compare
-          // start another loop
-          for (let j = 1; j < newArr.length; j += 1) {
-            // if first item project id is equal to 2nd item project id
-            if (
-              temp.project_id.toString() === newArr[j].project_id.toString()
-            ) {
-              // get the timetaken for the first item
-              let currentToken = temp.timetaken;
-              // get the time taken for the second item
-              let token = newArr[j].timetaken;
-              // remove the second item via splice
-              newArr.splice(i, 1);
-              // get a new total for item 1 time
-              let newToken = currentToken + token;
-              // assign the new total time to the first index
-              newArr[j].timetaken = newToken;
-            }
+          if (map[newArr[i].project_id]) {
+            map[newArr[i].project_id] += newArr[i].timetaken;
+          } else {
+            result.push(newArr[i].project_id);
+            map[newArr[i].project_id] = newArr[i].timetaken;
           }
         }
-        // return back new Array
-        return newArr;
+        const filteredArr = result.map((p: any) => {
+          return { project_id: p, timetaken: map[p] };
+        });
+        return filteredArr;
       }
       const filteredList = removeDuplicates(ProjectTime);
-
       const projectsList = projects.flat();
-
       const nameTimeArray: any = [];
-
-      // loop through filtered list
-      // for (let i = 0; i < projectsList.length; i += 1) {
-      //   if (String(projectsList[i]._id) == String(filteredList[i].project_id)) {
-      //     nameTimeArray.push({
-      //       name: projectsList[i].name,
-      //       value: timeConversion(filteredList[i].timetaken),
-      //     });
-      //   }
-      // }
-
       projectsList.forEach((pl) => {
-        filteredList.forEach((fl) => {
+        filteredList.forEach((fl: any) => {
           if (String(pl._id) == String(fl.project_id)) {
             nameTimeArray.push({
               name: pl.name,
@@ -390,15 +367,14 @@ class TaskController {
     }
   }
 
-  //TBD: need to discuss if we need delete task function
-  // async deleteTask(req: Request, res: Response) {
-  //   try {
-  //     const task = await this.model.findByIdAndDelete(req.params.id);
-  //     return res.json({ task });
-  //   } catch (error) {
-  //     console.log("Error message: ", error);
-  //   }
-  // }
+  async deleteTask(req: Request, res: Response) {
+    try {
+      const task = await this.model.findByIdAndDelete(req.params.id);
+      return res.json({ task });
+    } catch (error) {
+      console.log("Error message: ", error);
+    }
+  }
 }
 
 export default TaskController;

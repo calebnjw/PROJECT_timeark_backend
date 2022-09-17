@@ -37,8 +37,8 @@ export default class TasksRouter {
       .delete(
         "/:id/timetrackings/:timetracking_id",
         this.controller.deleteTimeTracking.bind(this.controller)
-      );
-    // .delete("/:id", this.controller.deleteTask.bind(this.controller));
+      )
+      .delete("/:id", this.controller.deleteTask.bind(this.controller));
 
     return router;
   }

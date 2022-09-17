@@ -45,9 +45,36 @@ class ProjectController {
 
   async getSingleProject(req: Request, res: Response) {
     try {
-      const project = await this.model.findById(req.params.id);
+      const project = await this.model
+        .findById(req.params.id)
+        .populate("task_ids");
+      // Calculate time and earings
+      // console.log("project: ", project);
+      const tasks = project?.task_ids;
+      const filteredTasks = tasks?.filter(
+        (t: any) => t.time_trackings.length > 0
+      );
+      console.log("filteredTasks: ", filteredTasks);
+
+      const taskTimeEarnings = filteredTasks?.map((t: any) => {
+        let timeArr;
+        if (t.time_trackings.length > 0) {
+          timeArr = t.time_trackings.map((tt: any) => {
+            const timeDiff =
+              new Date(tt.endDate).getTime() - new Date(tt.startDate).getTime();
+            const getHours = timeDiff / (1000 * 60 * 60);
+            return getHours;
+          });
+        }
+        console.log("timeArr: ", timeArr);
+        const sumOfTime = timeArr.reduce((a: any, b: any) => a + b);
+        const earings = sumOfTime * Number(project?.rate);
+        return { value: earings, name: t.name };
+      });
+      console.log("taskTimeEarnings: ", taskTimeEarnings);
+
       if (project) {
-        return res.json({ project });
+        return res.json({ project, taskTimeEarnings });
       } else {
         return res.json({ msg: "no project created!" });
       }
