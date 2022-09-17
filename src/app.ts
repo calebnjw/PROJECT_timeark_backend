@@ -7,8 +7,6 @@ import express from "express";
 import expressSession from "express-session";
 import passport from "passport";
 
-import isAuthenticated from "./middleware/authMiddleware";
-
 dotenv.config();
 
 const PORT = process.env.PORT || 8080;
@@ -87,7 +85,6 @@ app.use(passport.session());
 import "./config/passport";
 
 app.use("/auth", authRouter);
-app.use(isAuthenticated());
 app.use("/users", usersRouter);
 app.use("/clients", clientRouter);
 app.use("/projects", projectsRouter);
