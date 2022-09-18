@@ -16,9 +16,9 @@ class ClientController {
       if (request.user) {
         const { id } = request.user;
         console.log("user id: ", id);
-        const data = await this.model.find({ user_id: id });
-        if (data) {
-          return response.status(200).json(data);
+        const clients = await this.model.find({ user_id: id });
+        if (clients) {
+          return response.status(200).json({ success: true, clients });
         } else {
           return response.json({ msg: "no client found" });
         }
@@ -44,8 +44,8 @@ class ClientController {
     const clientDetails = { ...request.body, user_id: request.user?.id };
     console.log("client details: ", clientDetails);
     try {
-      const data = await this.model.create(clientDetails);
-      return response.status(200).json(data);
+      const newclient = await this.model.create(clientDetails);
+      return response.status(200).json({ success: true, newclient });
     } catch (error) {
       return response.status(500).json("no client found!");
     }
