@@ -39,10 +39,12 @@ const UserSchema: Schema = new Schema(
     emails: [EmailSchema],
     photos: [PhotoSchema],
     billingDetails: BillingSchema,
-    client_id: {
-      type: Schema.Types.ObjectId,
-      ref: "Client",
-    },
+    client_ids: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Client",
+      },
+    ],
   },
   {
     timestamps: true,

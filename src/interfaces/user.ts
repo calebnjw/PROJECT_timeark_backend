@@ -1,4 +1,4 @@
-import { ObjectId, Document } from "mongoose";
+import { ObjectId, Document, Types } from "mongoose";
 
 export default interface IUsers extends Document {
   _id: ObjectId;
@@ -9,7 +9,11 @@ export default interface IUsers extends Document {
   emails: IEmail[];
   photos?: IPhoto[];
   billingDetails?: IBilling;
-  clientIds?: string[];
+  client_ids?: [
+    {
+      type: Types.ObjectId;
+    }
+  ];
 }
 
 export interface IName extends IUsers {

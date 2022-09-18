@@ -4,6 +4,7 @@ import { Model, ObjectId } from "mongoose";
 import Project from "../models/project";
 import IClients from "../interfaces/client";
 import users from "../models/users";
+import Task from "../models/task";
 
 class ClientController {
   public model: Model<IClients>;
@@ -15,7 +16,6 @@ class ClientController {
     try {
       if (request.user) {
         const { id } = request.user;
-        console.log("user id: ", id);
         const clients = await this.model.find({ user_id: id });
         if (clients) {
           return response.status(200).json({ success: true, clients });
@@ -30,7 +30,6 @@ class ClientController {
 
   async getOneClient(request: Request, response: Response) {
     const { clientId } = request.params;
-
     try {
       // create new BSON.ObjectId to search MongoDB
       const data = await this.model.find({ _id: new BSON.ObjectId(clientId) });
@@ -41,10 +40,13 @@ class ClientController {
   }
 
   async createClient(request: Request, response: Response) {
-    const clientDetails = { ...request.body, user_id: request.user?.id };
-    console.log("client details: ", clientDetails);
+    const userId = request.user?.id;
+    const clientDetails = { ...request.body, user_id: userId };
     try {
       const newclient = await this.model.create(clientDetails);
+      const user = await users.findById(userId);
+      user?.client_ids?.push(newclient._id);
+      await user?.save();
       return response.status(200).json({ success: true, newclient });
     } catch (error) {
       return response.status(500).json("no client found!");
@@ -53,9 +55,7 @@ class ClientController {
 
   async updateClient(request: Request, response: Response) {
     const { clientId } = request.params;
-    // console.log(request.body);
     const clientDetails = request.body;
-
     try {
       const data = await this.model.updateOne(
         { _id: new BSON.ObjectId(clientId) },
@@ -72,15 +72,20 @@ class ClientController {
     try {
       // delete client from client table
       const client: any = await this.model.findByIdAndDelete(clientId);
+
+      // delete tasks of projects
+      const projectIds = client.project_ids;
+      projectIds.forEach(async (id: any) => {
+        await Task.deleteMany({ project_id: id });
+      });
       // delete projects from with client id
       await Project.deleteMany({ client_id: clientId });
       //Remove client id from user's client_ids array
-      // const user = await users.updateOne(
-      //   { _id: client.user_id },
-      //   { $pull: { client_ids: clientId } }
-      // );
-
-      return response.json("deleted client successfully");
+      const user = await users.updateOne(
+        { _id: client.user_id },
+        { $pull: { client_ids: clientId } }
+      );
+      return response.json({ msg: "deleted client successfully" });
     } catch (error) {
       console.log("Error message: ", error);
     }
