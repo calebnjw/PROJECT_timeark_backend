@@ -4,7 +4,8 @@ import IProjects from "../interfaces/project";
 import IClients from "../interfaces/client";
 import Client from "../models/client";
 import Project from "../models/project";
-import mongoose from "mongoose";
+import Task from "../models/task";
+import Invoice from "../models/invoice";
 
 class ProjectController {
   public model: Model<IProjects>;
@@ -117,6 +118,8 @@ class ProjectController {
     try {
       const projectId = req.params.id;
       const project: any = await this.model.findByIdAndDelete(projectId);
+      await Task.deleteMany({ project_id: projectId });
+      await Invoice.deleteMany({ project_id: projectId });
       const client = await Client.updateOne(
         { _id: project.client_id },
         { $pull: { project_ids: projectId } }
