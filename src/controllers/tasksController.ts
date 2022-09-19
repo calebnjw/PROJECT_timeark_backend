@@ -4,11 +4,9 @@ import ITasks from "../interfaces/task";
 import Project from "../models/project";
 import Client from "../models/client";
 import Task from "../models/task";
-import ClientController from "./clientController";
 import timeConversion from "../scripts/timeConversion";
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
 import enGB from "date-fns/locale/en-GB";
-import project from "../models/project";
 
 class TaskController {
   public model: Model<ITasks>;
@@ -366,7 +364,7 @@ class TaskController {
     try {
       const taskId = req.params.id;
       const task: any = await this.model.findByIdAndDelete(taskId);
-      const project = await Project.updateOne(
+      await Project.updateOne(
         { _id: task.project_id },
         { $pull: { task_ids: taskId } }
       );

@@ -1,8 +1,5 @@
-import bcrypt from "bcrypt";
-
 import { Request, Response } from "express";
 import { Model } from "mongoose";
-
 import IUsers from "../interfaces/user";
 
 const EXPIRED_MESSAGE = "Session expired, please login again.";
@@ -33,7 +30,9 @@ class UserController {
         return response.status(404).json({ success: false });
       }
     } else {
-      return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
+      return response
+        .status(401)
+        .json({ success: false, message: EXPIRED_MESSAGE });
     }
   }
 
@@ -62,7 +61,9 @@ class UserController {
         return response.status(500).json({ success: false, message: error });
       }
     } else {
-      return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
+      return response
+        .status(401)
+        .json({ success: false, message: EXPIRED_MESSAGE });
     }
   }
 
@@ -88,7 +89,9 @@ class UserController {
         return response.status(500).json({ success: false, message: error });
       }
     } else {
-      return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
+      return response
+        .status(401)
+        .json({ success: false, message: EXPIRED_MESSAGE });
     }
   }
 
@@ -117,7 +120,9 @@ class UserController {
         return response.status(500).json({ success: false, message: error });
       }
     } else {
-      return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
+      return response
+        .status(401)
+        .json({ success: false, message: EXPIRED_MESSAGE });
     }
   }
 }
