@@ -75,7 +75,6 @@ class ClientController {
 
       // delete tasks of projects
       const projectIds = client.project_ids;
-      console.log(projectIds);
       if (projectIds > 0) {
         projectIds.forEach(async (id: any) => {
           await Task.deleteMany({ project_id: id });
