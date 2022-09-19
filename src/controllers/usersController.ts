@@ -1,8 +1,5 @@
-import bcrypt from "bcrypt";
-
 import { Request, Response } from "express";
 import { Model } from "mongoose";
-
 import IUsers from "../interfaces/user";
 
 const EXPIRED_MESSAGE = "Session expired, please login again.";
@@ -25,7 +22,6 @@ class UserController {
   async getUser(request: Request, response: Response) {
     if (request.user) {
       const { id, newUser } = request.user;
-
       try {
         const user = await this.model.findOne({ _id: id });
         return response.status(200).json({ success: true, user, newUser });
@@ -33,7 +29,9 @@ class UserController {
         return response.status(404).json({ success: false });
       }
     } else {
-      return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
+      return response
+        .status(401)
+        .json({ success: false, message: EXPIRED_MESSAGE });
     }
   }
 
@@ -62,7 +60,9 @@ class UserController {
         return response.status(500).json({ success: false, message: error });
       }
     } else {
-      return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
+      return response
+        .status(401)
+        .json({ success: false, message: EXPIRED_MESSAGE });
     }
   }
 
@@ -88,7 +88,9 @@ class UserController {
         return response.status(500).json({ success: false, message: error });
       }
     } else {
-      return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
+      return response
+        .status(401)
+        .json({ success: false, message: EXPIRED_MESSAGE });
     }
   }
 
@@ -117,7 +119,9 @@ class UserController {
         return response.status(500).json({ success: false, message: error });
       }
     } else {
-      return response.status(401).json({ success: false, message: EXPIRED_MESSAGE });
+      return response
+        .status(401)
+        .json({ success: false, message: EXPIRED_MESSAGE });
     }
   }
 }

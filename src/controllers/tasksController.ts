@@ -4,11 +4,9 @@ import ITasks from "../interfaces/task";
 import Project from "../models/project";
 import Client from "../models/client";
 import Task from "../models/task";
-import ClientController from "./clientController";
 import timeConversion from "../scripts/timeConversion";
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
 import enGB from "date-fns/locale/en-GB";
-import project from "../models/project";
 
 class TaskController {
   public model: Model<ITasks>;
@@ -33,7 +31,10 @@ class TaskController {
     try {
       const { project_id } = req.body;
       const project: any = await Project.findById(project_id);
-      const createTask = await this.model.create({ ...req.body });
+      const createTask = await this.model.create({
+        ...req.body,
+        isDone: false,
+      });
       project.task_ids.push(createTask.id);
       await project.save();
       const newTask = await this.model
@@ -55,9 +56,14 @@ class TaskController {
   }
 
   async updateTask(req: Request, res: Response) {
+    const updatedTask = req.body;
     try {
-      const task = await this.model.findByIdAndUpdate(req.params.id, req.body);
-      return res.json({ msg: "Task updated" });
+      const task = await this.model.updateOne(
+        { _id: req.params.id },
+        { $set: updatedTask }
+      );
+      const getUpdatedTask = await this.model.findById(req.params.id);
+      return res.json({ msg: "Task updated", getUpdatedTask });
     } catch (error) {
       console.log("Error message: ", error);
     }
@@ -366,7 +372,7 @@ class TaskController {
     try {
       const taskId = req.params.id;
       const task: any = await this.model.findByIdAndDelete(taskId);
-      const project = await Project.updateOne(
+      await Project.updateOne(
         { _id: task.project_id },
         { $pull: { task_ids: taskId } }
       );

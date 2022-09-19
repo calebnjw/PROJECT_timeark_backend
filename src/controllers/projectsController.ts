@@ -120,11 +120,10 @@ class ProjectController {
       const project: any = await this.model.findByIdAndDelete(projectId);
       await Task.deleteMany({ project_id: projectId });
       await Invoice.deleteMany({ project_id: projectId });
-      const client = await Client.updateOne(
+      await Client.updateOne(
         { _id: project.client_id },
         { $pull: { project_ids: projectId } }
       );
-
       return res.json({ project });
     } catch (error) {
       console.log("Error message: ", error);
