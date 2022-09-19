@@ -16,6 +16,7 @@ export default class InvoicesRouter {
         "/:invoice_id",
         this.controller.getSingleInvoice.bind(this.controller)
       )
+      .put("/:id/update", this.controller.updateInvoice.bind(this.controller))
       .delete("/invoice/:invoiceId", this.controller.deleteSingleInvoice.bind(this.controller))
 
     return router;

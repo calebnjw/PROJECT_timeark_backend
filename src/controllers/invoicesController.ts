@@ -83,19 +83,24 @@ class InvoiceController {
 
       console.log("time trackings", timeTaskArr)
       const sortedTimeTaskArr = timeTaskArr.flat();
-
+      console.log("sortedtimearray", sortedTimeTaskArr)
       const timeArr: any = sortedTimeTaskArr.map((timeTask:any) => {
         console.log(timeTask.time_trackings)
-        const timeArr = timeTask.time_trackings.map((tt:any) => {
-          const st = new Date(tt.startDate).getTime();
-          const dt = new Date(tt.endDate).getTime();
-          const timeDiff = dt - st;
-          const getHours = timeDiff /(1000 * 60 * 60)
-          return getHours;
-        });
+        let timeArr = [];
+       if (timeTask.time_trackings.length === 0){
+          return res.json({msg: "No time tracking present"})
+       }
+            timeArr = timeTask.time_trackings.map((tt:any) => {
+            const st = new Date(tt.startDate).getTime();
+            const dt = new Date(tt.endDate).getTime();
+            const timeDiff = dt - st;
+            const getHours = timeDiff /(1000 * 60 * 60)
+            return getHours;
+          });
+      
         const sumOfTime = timeArr.reduce((a:any, b:any) => a+b);
           return {"taskName": timeTask.name, "timeSpent":sumOfTime}
-      })
+      });
 
       console.log(" time arr: ", timeArr)
       const totalTimeSpent = timeArr.reduce((a:any, b:any) => a.timeSpent + b.timeSpent);
@@ -122,11 +127,14 @@ class InvoiceController {
           amount: totalAmount,
           time_trackings: timeArr,
         };
-        const newInvoiceDetails = await this.model.create(newInvoice);
+        console.log("new invoice: ", newInvoice)
+      
+        const newInvoiceDetails: any = await this.model.create(newInvoice);
         selectedProject?.invoice_ids.push(newInvoiceDetails._id);
         await selectedProject?.save(); 
         
-      return res.json({ msg: "Added new invoice", newInvoiceDetails });
+        console.log("newInvoiceDetails", newInvoiceDetails)
+        return res.json({ msg: "Added new invoice" });
       }
     } catch (err) {
       console.log("Error message: ", err);
@@ -143,10 +151,20 @@ class InvoiceController {
     }
   }
 
+  async updateInvoice(req: Request, res: Response) {
+    try {
+      const invoice = await this.model.findByIdAndUpdate(req.params.id, req.body);
+      return res.json({ msg: "Invoice updated"})
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+
   async deleteSingleInvoice(req: Request, res: Response) {
     try {
       const invoice = await this.model.findByIdAndDelete(req.params.invoiceId);
-      console.log("paramsid", req.params.invoiceId);
+      
       return res.json({ invoice });
     } catch (err) {
       console.log(err);
