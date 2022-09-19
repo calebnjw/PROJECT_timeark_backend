@@ -75,19 +75,24 @@ class ClientController {
 
       // delete tasks of projects
       const projectIds = client.project_ids;
-      projectIds.forEach(async (id: any) => {
-        await Task.deleteMany({ project_id: id });
-      });
-      // delete projects from with client id
-      await Project.deleteMany({ client_id: clientId });
+      console.log(projectIds);
+      if (projectIds > 0) {
+        projectIds.forEach(async (id: any) => {
+          await Task.deleteMany({ project_id: id });
+        });
+        // delete projects from with client id
+        await Project.deleteMany({ client_id: clientId });
+      }
       //Remove client id from user's client_ids array
       const user = await users.updateOne(
         { _id: client.user_id },
         { $pull: { client_ids: clientId } }
       );
-      return response.json({ msg: "deleted client successfully" });
+      return response
+        .status(200)
+        .json({ success: true, msg: "deleted client successfully" });
     } catch (error) {
-      console.log("Error message: ", error);
+      return response.status(500).json("delete client error");
     }
   }
 }
