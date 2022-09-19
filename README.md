@@ -1,31 +1,23 @@
-# Time Ark Backend
+# Time Ark
 
-Time tracking and user invoicing app for freelancers.
+Time Ark is a desktop only app designed for freelancers to manage their projects and tasks via one system. Users can track how much time they are spending on their projects and can create an invoice easily with this web app.
 
-# npm run serve to start server
+## Backend
 
+This is the backend for Time Ark.
 
-# Mongo DB connection
+## Technologies
 
-To configure MongoDB, in .env file, set MONGO_URI and MONGO_NAME
+- Express
+- Passport Authentication
+- OAuth2.0
+- Moongoose
+- Typescript
 
-MONGO_URI refers to the connection string to access MongoDB server
+## Database ERD
 
-MONGO_NAME is the name of the Mongo database within the server
+- Click [here](https://lucid.app/lucidchart/f5c2691a-b4bc-4172-ae42-741fba205bb5/edit?viewport_loc=-453%2C226%2C2304%2C1169%2C0_0&invitationId=inv_2a2e14df-fff2-443d-86e1-679dd5c03ed4#) to view
 
-Example:
+## Frontend Repo
 
-```
-MONGO_URI=mongodb+srv://{{username}}:{{password}}@{{server_url}}/?retryWrites=true&w=majority
-MONGO_NAME=timeoark
-```
-
-With mongoDB cloud, `server_url` is of form: xxx.xxx.mongodb.net
-
-If you are using a local mongo database, connectiont string should be:
-
-```
-MONGO_URI="mongodb://127.0.0.1:27017"
-MONGO_NAME=timeark
-
-```
+- Click [here](https://github.com/calebnjw/PROJECT_timeark_frontend) to view
