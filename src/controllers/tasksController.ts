@@ -31,7 +31,10 @@ class TaskController {
     try {
       const { project_id } = req.body;
       const project: any = await Project.findById(project_id);
-      const createTask = await this.model.create({ ...req.body });
+      const createTask = await this.model.create({
+        ...req.body,
+        isDone: false,
+      });
       project.task_ids.push(createTask.id);
       await project.save();
       const newTask = await this.model
@@ -53,9 +56,14 @@ class TaskController {
   }
 
   async updateTask(req: Request, res: Response) {
+    const updatedTask = req.body;
     try {
-      const task = await this.model.findByIdAndUpdate(req.params.id, req.body);
-      return res.json({ msg: "Task updated" });
+      const task = await this.model.updateOne(
+        { _id: req.params.id },
+        { $set: updatedTask }
+      );
+      const getUpdatedTask = await this.model.findById(req.params.id);
+      return res.json({ msg: "Task updated", getUpdatedTask });
     } catch (error) {
       console.log("Error message: ", error);
     }

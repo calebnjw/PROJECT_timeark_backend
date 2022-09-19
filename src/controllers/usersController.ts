@@ -22,7 +22,6 @@ class UserController {
   async getUser(request: Request, response: Response) {
     if (request.user) {
       const { id, newUser } = request.user;
-
       try {
         const user = await this.model.findOne({ _id: id });
         return response.status(200).json({ success: true, user, newUser });
